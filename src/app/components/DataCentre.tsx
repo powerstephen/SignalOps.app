@@ -19,22 +19,22 @@ const categories = [
 ]
 
 const integrations: Integration[] = [
-  { id:'hubspot',    name:'HubSpot',    fallback:'🟠', logo:'https://cdn.worldvectorlogo.com/logos/hubspot-1.svg',    category:'crm',      description:'Sync contacts, deals, and pipeline data automatically.', datasets:[{label:'CRM Contacts',records:200,fields:['company','contact','deal_stage','deal_value','last_activity','status']}] },
-  { id:'salesforce', name:'Salesforce', fallback:'🔵', logo:'https://cdn.worldvectorlogo.com/logos/salesforce-2.svg', category:'crm',      description:'Connect your Salesforce org to sync leads, opportunities, and custom objects.', comingSoon:true },
-  { id:'attio',      name:'Attio',      fallback:'🟣', logo:'https://cdn.worldvectorlogo.com/logos/attio.svg',         category:'crm',      description:'Powerful CRM integration to manage relationships and track deal flow.', comingSoon:true },
-  { id:'pipedrive',  name:'Pipedrive',  fallback:'🟢', logo:'https://cdn.worldvectorlogo.com/logos/pipedrive.svg',    category:'crm',      description:'Pull deal stages, contact activity, and pipeline data from Pipedrive.', comingSoon:true },
-  { id:'stripe',     name:'Stripe',     fallback:'💳', logo:'https://cdn.worldvectorlogo.com/logos/stripe-4.svg',     category:'billing',  description:'Connect Stripe to analyse real LTV, MRR, churn, and expansion revenue.', datasets:[{label:'Billing Data',records:20,fields:['customer','mrr','ltv','plan','churn_date','expansion_revenue']}] },
-  { id:'chargebee',  name:'Chargebee',  fallback:'📊', logo:'https://cdn.worldvectorlogo.com/logos/chargebee.svg',   category:'billing',  description:'Import subscription billing data to power your best-customer ICP profile.', datasets:[{label:'Subscription Data',records:20,fields:['company','mrr','arr','plan','seats','renewal_date']}] },
-  { id:'paddle',     name:'Paddle',     fallback:'🏓', logo:'https://cdn.worldvectorlogo.com/logos/paddle-1.svg',     category:'billing',  description:'Sync Paddle billing events and revenue data for LTV analysis.', comingSoon:true },
-  { id:'intercom',   name:'Intercom',   fallback:'💬', logo:'https://cdn.worldvectorlogo.com/logos/intercom-1.svg',  category:'cs',       description:'Pull support ticket volume, type, and sentiment to identify high-maintenance accounts.', datasets:[{label:'CS Tickets',records:20,fields:['company','tickets','ticket_type','sentiment','response_time','health_trend']}] },
-  { id:'zendesk',    name:'Zendesk',    fallback:'🎫', logo:'https://cdn.worldvectorlogo.com/logos/zendesk-1.svg',   category:'cs',       description:'Import CS ticket history to surface which customers are truly profitable.', datasets:[{label:'Support History',records:20,fields:['company','open_tickets','sentiment','risk_flags','csm']}] },
-  { id:'freshdesk',  name:'Freshdesk',  fallback:'🌿', logo:'https://cdn.worldvectorlogo.com/logos/freshdesk.svg',   category:'cs',       description:'Connect Freshdesk to analyse support cost per customer.', comingSoon:true },
-  { id:'outreach',   name:'Outreach',   fallback:'📤', logo:'https://cdn.worldvectorlogo.com/logos/outreach-3.svg',  category:'outreach', description:'Push scored accounts and emails directly to Outreach sequences.', comingSoon:true },
-  { id:'salesloft',  name:'Salesloft',  fallback:'📨', logo:'https://cdn.worldvectorlogo.com/logos/salesloft.svg',   category:'outreach', description:'Send high-scoring accounts straight to Salesloft for sequencing.', comingSoon:true },
-  { id:'apollo',     name:'Apollo',     fallback:'🚀', logo:'https://cdn.worldvectorlogo.com/logos/apollo-io-1.svg', category:'outreach', description:'Export lookalike prospects to Apollo outreach campaigns.', comingSoon:true },
-  { id:'linkedin',   name:'LinkedIn',   fallback:'🔗', logo:'https://cdn.worldvectorlogo.com/logos/linkedin-icon-2.svg', category:'signals', description:'Monitor job changes, hiring signals, and company updates.', comingSoon:true },
-  { id:'harmonic',   name:'Harmonic',   fallback:'📡', logo:'',                                                        category:'signals',  description:'Pull funding, headcount, and hiring signal data via Harmonic API.', comingSoon:true },
-  { id:'bombora',    name:'Bombora',    fallback:'🎯', logo:'',                                                        category:'signals',  description:'Layer intent signal data to identify in-market accounts.', comingSoon:true },
+  { id:'hubspot',    name:'HubSpot',    fallback:'HS', logo:'https://cdn.worldvectorlogo.com/logos/hubspot-1.svg',         category:'crm',      description:'Sync contacts, deals, and pipeline data automatically.', datasets:[{label:'CRM Contacts',records:200,fields:['company','contact','deal_stage','deal_value','last_activity','status']}] },
+  { id:'salesforce', name:'Salesforce', fallback:'SF', logo:'https://cdn.worldvectorlogo.com/logos/salesforce-2.svg',      category:'crm',      description:'Connect your Salesforce org to sync leads, opportunities, and custom objects.', comingSoon:true },
+  { id:'attio',      name:'Attio',      fallback:'AT', logo:'https://cdn.worldvectorlogo.com/logos/attio.svg',              category:'crm',      description:'Powerful CRM integration to manage relationships and track deal flow.', comingSoon:true },
+  { id:'pipedrive',  name:'Pipedrive',  fallback:'PD', logo:'https://cdn.worldvectorlogo.com/logos/pipedrive.svg',         category:'crm',      description:'Pull deal stages, contact activity, and pipeline data from Pipedrive.', comingSoon:true },
+  { id:'stripe',     name:'Stripe',     fallback:'ST', logo:'https://cdn.worldvectorlogo.com/logos/stripe-4.svg',          category:'billing',  description:'Connect Stripe to analyse real LTV, MRR, churn, and expansion revenue.', datasets:[{label:'Billing Data',records:20,fields:['customer','mrr','ltv','plan','churn_date','expansion_revenue']}] },
+  { id:'chargebee',  name:'Chargebee',  fallback:'CB', logo:'https://cdn.worldvectorlogo.com/logos/chargebee.svg',         category:'billing',  description:'Import subscription billing data to power your best-customer ICP profile.', datasets:[{label:'Subscription Data',records:20,fields:['company','mrr','arr','plan','seats','renewal_date']}] },
+  { id:'paddle',     name:'Paddle',     fallback:'PA', logo:'https://cdn.worldvectorlogo.com/logos/paddle-1.svg',          category:'billing',  description:'Sync Paddle billing events and revenue data for LTV analysis.', comingSoon:true },
+  { id:'intercom',   name:'Intercom',   fallback:'IC', logo:'https://cdn.worldvectorlogo.com/logos/intercom-1.svg',        category:'cs',       description:'Pull support ticket volume, type, and sentiment to identify high-maintenance accounts.', datasets:[{label:'CS Tickets',records:20,fields:['company','tickets','ticket_type','sentiment','response_time','health_trend']}] },
+  { id:'zendesk',    name:'Zendesk',    fallback:'ZD', logo:'https://cdn.worldvectorlogo.com/logos/zendesk-1.svg',         category:'cs',       description:'Import CS ticket history to surface which customers are truly profitable.', datasets:[{label:'Support History',records:20,fields:['company','open_tickets','sentiment','risk_flags','csm']}] },
+  { id:'freshdesk',  name:'Freshdesk',  fallback:'FD', logo:'https://cdn.worldvectorlogo.com/logos/freshdesk.svg',         category:'cs',       description:'Connect Freshdesk to analyse support cost per customer.', comingSoon:true },
+  { id:'outreach',   name:'Outreach',   fallback:'OR', logo:'https://cdn.worldvectorlogo.com/logos/outreach-3.svg',        category:'outreach', description:'Push scored accounts and emails directly to Outreach sequences.', comingSoon:true },
+  { id:'salesloft',  name:'Salesloft',  fallback:'SL', logo:'https://cdn.worldvectorlogo.com/logos/salesloft.svg',         category:'outreach', description:'Send high-scoring accounts straight to Salesloft for sequencing.', comingSoon:true },
+  { id:'apollo',     name:'Apollo',     fallback:'AP', logo:'https://cdn.worldvectorlogo.com/logos/apollo-io-1.svg',       category:'outreach', description:'Export lookalike prospects to Apollo outreach campaigns.', comingSoon:true },
+  { id:'linkedin',   name:'LinkedIn',   fallback:'LI', logo:'https://cdn.worldvectorlogo.com/logos/linkedin-icon-2.svg',   category:'signals',  description:'Monitor job changes, hiring signals, and company updates.', comingSoon:true },
+  { id:'harmonic',   name:'Harmonic',   fallback:'HM', logo:'/harmonic.png',  category:'signals',  description:'Pull funding, headcount, and hiring signal data via Harmonic API.', comingSoon:true },
+  { id:'bombora',    name:'Bombora',    fallback:'BO', logo:'/bombora.png',   category:'signals',  description:'Layer intent signal data to identify in-market accounts.', comingSoon:true },
 ]
 
 const catColors: Record<string, string> = {
@@ -46,7 +46,11 @@ const catLabels: Record<string, string> = { crm:'CRM', billing:'Billing', cs:'CS
 function IntegrationLogo({ logo, fallback, name }: { logo: string; fallback: string; name: string }) {
   const [error, setError] = useState(false)
   if (!logo || error) {
-    return <span className="text-2xl">{fallback}</span>
+    return (
+      <span className="text-xs font-bold text-slate-500 tracking-wide">
+        {fallback}
+      </span>
+    )
   }
   return (
     <img
