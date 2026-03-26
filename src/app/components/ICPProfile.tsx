@@ -4,7 +4,7 @@ import { Target, TrendingUp, AlertTriangle, CheckCircle, Star, Zap, Users, Dolla
 
 const MOCK_RESULT = {
   summary: "Koreva's best customers are mid-market B2B SaaS companies in HR Tech and Sales Tech, typically Series A to Series B, with 40–90 employees. They reach value fast, expand consistently, and generate 3.4x the LTV of your average customer with 45% fewer support tickets.",
-  revenue_reality: { total_analysed:100, best_customers:24, avg_ltv_best:68400, avg_ltv_all:20200, ltv_multiplier:'3.4x', revenue_concentration:'71%', avg_time_to_value_best:18, expansion_rate_best:82 },
+  revenue_reality: { total_analysed:100, best_customers:24, avg_ltv_best:68400, avg_ltv_all:20200, ltv_multiplier:'3.4x', revenue_concentration:'71%' },
   primary_icp: {
     label:'Primary ICP', color:'teal', title:'Mid-Market HR & Sales Tech',
     size:'40–90 employees', stage:'Series A to Series B',
@@ -30,10 +30,10 @@ const MOCK_RESULT = {
     {label:'200+',value:8,color:'#E0E7FF'},
   ],
   profitability_matrix:[
-    {label:'Champions',desc:'High LTV · Low tickets',count:14,ltv:'€74k avg',tickets:'2.1 avg',color:'teal',action:'Clone these — they are your ICP'},
-    {label:'Diamonds',desc:'High LTV · High tickets',count:10,ltv:'€61k avg',tickets:'11.4 avg',color:'amber',action:'Worth it, but set expectations early'},
-    {label:'Quick Wins',desc:'Lower LTV · Low tickets',count:31,ltv:'€18k avg',tickets:'2.8 avg',color:'blue',action:'Good volume play — easy to serve'},
-    {label:'Drains',desc:'Low LTV · High tickets',count:45,ltv:'€9k avg',tickets:'14.2 avg',color:'red',action:'Stop targeting these profiles'},
+    {label:'Champions',desc:'High LTV · Low tickets',count:14,ltv:'€74k avg',tickets:'2.1 avg',color:'teal' as const,action:'Clone these — they are your ICP'},
+    {label:'Diamonds',desc:'High LTV · High tickets',count:10,ltv:'€61k avg',tickets:'11.4 avg',color:'amber' as const,action:'Worth it, but set expectations early'},
+    {label:'Quick Wins',desc:'Lower LTV · Low tickets',count:31,ltv:'€18k avg',tickets:'2.8 avg',color:'blue' as const,action:'Good volume play — easy to serve'},
+    {label:'Drains',desc:'Low LTV · High tickets',count:45,ltv:'€9k avg',tickets:'14.2 avg',color:'red' as const,action:'Stop targeting these profiles'},
   ],
   red_flags:[
     'Solo founders with no sales motion — high churn within 90 days',
@@ -43,6 +43,13 @@ const MOCK_RESULT = {
     'Single contact engaged — champion dependency, high churn risk',
   ],
   scorecard:{ size:'40–90 employees', stage:'Series A to Series B', industries:'HR Tech or Sales Tech', regions:'USA or UK', time_to_value:'18 days', expansion_window:'6 months', ltv_multiplier:'3.4x', ticket_reduction:'45%' },
+}
+
+const MATRIX_STYLES = {
+  teal:  {border:'border-teal-500/40',  bg:'bg-teal-500/5',  badge:'bg-teal-500 text-white',  text:'text-teal-400'},
+  amber: {border:'border-amber-500/40', bg:'bg-amber-500/5', badge:'bg-amber-500 text-white', text:'text-amber-400'},
+  blue:  {border:'border-blue-500/40',  bg:'bg-blue-500/5',  badge:'bg-blue-500 text-white',  text:'text-blue-400'},
+  red:   {border:'border-red-500/40',   bg:'bg-red-500/5',   badge:'bg-red-500 text-white',   text:'text-red-400'},
 }
 
 function DonutChart({ data, size=140 }: { data:{label:string;value:number;color:string}[]; size?:number }) {
@@ -149,7 +156,6 @@ export default function ICPProfile() {
       ) : (
         <div className="space-y-6">
 
-          {/* Summary */}
           <div className="bg-teal-500/10 border border-teal-500/30 rounded-2xl p-5">
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 bg-teal-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"><Target size={16} className="text-white"/></div>
@@ -160,7 +166,6 @@ export default function ICPProfile() {
             </div>
           </div>
 
-          {/* Revenue reality */}
           <div>
             <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2"><DollarSign size={15} className="text-teal-400"/>Revenue Reality</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -171,7 +176,6 @@ export default function ICPProfile() {
             </div>
           </div>
 
-          {/* Charts */}
           <div className="grid md:grid-cols-2 gap-4">
             {[{title:'Industry breakdown — best customers',data:R.industry_breakdown,suffix:''},{title:'Company size — best customers',data:R.size_breakdown,suffix:' employees'}].map(chart=>(
               <div key={chart.title} className="bg-slate-800/40 border border-slate-700 rounded-2xl p-5">
@@ -192,7 +196,6 @@ export default function ICPProfile() {
             ))}
           </div>
 
-          {/* ICP profiles */}
           <div>
             <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2"><Target size={15} className="text-teal-400"/>ICP Profiles</h3>
             <div className="grid md:grid-cols-2 gap-4">
@@ -201,18 +204,12 @@ export default function ICPProfile() {
             </div>
           </div>
 
-          {/* Profitability matrix */}
           <div>
             <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2"><TrendingUp size={15} className="text-teal-400"/>Profitability Matrix</h3>
             <p className="text-xs text-slate-500 mb-3">LTV vs support cost — which customers are actually worth having</p>
             <div className="grid grid-cols-2 gap-3">
               {R.profitability_matrix.map(q=>{
-                const st:Record<string,{border:string;bg:string;badge:string;text:string}>={
-                  teal:{border:'border-teal-500/40',bg:'bg-teal-500/5',badge:'bg-teal-500 text-white',text:'text-teal-400'},
-                  amber:{border:'border-amber-500/40',bg:'bg-amber-500/5',badge:'bg-amber-500 text-white',text:'text-amber-400'},
-                  blue:{border:'border-blue-500/40',bg:'bg-blue-500/5',badge:'bg-blue-500 text-white',text:'text-blue-400'},
-                  red:{border:'border-red-500/40',bg:'bg-red-500/5',badge:'bg-red-500 text-white',text:'text-red-400'},
-                }[q.color]!
+                const st = MATRIX_STYLES[q.color]
                 return (
                   <div key={q.label} className={`border ${st.border} ${st.bg} rounded-xl p-4`}>
                     <div className="flex items-center justify-between mb-2">
@@ -231,7 +228,6 @@ export default function ICPProfile() {
             </div>
           </div>
 
-          {/* Red flags */}
           <div className="bg-red-500/5 border border-red-500/20 rounded-2xl p-5">
             <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2"><AlertTriangle size={15} className="text-red-400"/>Red Flags — Who NOT to Target</h3>
             <div className="space-y-2">
@@ -244,7 +240,6 @@ export default function ICPProfile() {
             </div>
           </div>
 
-          {/* Scorecard */}
           <div className="bg-slate-800/40 border border-teal-500/30 rounded-2xl p-5">
             <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2"><Star size={15} className="text-teal-400"/>Your ICP Scorecard</h3>
             <p className="text-xs text-slate-500 mb-4">Your ideal customer in plain English</p>
