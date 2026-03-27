@@ -1,52 +1,67 @@
 'use client'
 import { useState } from 'react'
-import { Lock, TrendingUp, AlertTriangle, CheckCircle, Star, Zap, ArrowRight, DollarSign, Users, MessageSquare, BookOpen, Video, FileText } from 'lucide-react'
+import { Lock, TrendingUp, AlertTriangle, CheckCircle, Star, Zap, ArrowRight, DollarSign, Users, MessageSquare, BookOpen, Video, FileText, ChevronRight } from 'lucide-react'
 
 const DATA = {
   summary: { champions:14, diamonds:10, quickwins:31, drains:45, total:100, champion_revenue_pct:71, drain_cost_pct:48 },
+  top_actions: [
+    { rank:1, action:'Fix onboarding for 19 drain accounts', value:'€171k at risk', owner:'CS Team', urgency:'high', detail:'19 customers never completed onboarding — averaging 18 support tickets/mo each' },
+    { rank:2, action:'Reduce integration friction for 10 Diamonds', value:'€134k in recoverable margin', owner:'Product Team', urgency:'high', detail:'42% of Diamond tickets are integration setup issues fixable with video guides' },
+    { rank:3, action:'Upgrade campaign for 18 Quick Win accounts', value:'€162k additional ARR', owner:'Sales Team', urgency:'medium', detail:'18 accounts on Starter plan are using Growth features — primed for upgrade' },
+  ],
+  leaks: [
+    { id:'l1', type:'drain', title:'Onboarding never completed', count:19, revenue_impact:'€171k at risk', avg_tickets:18, urgency:'High', fix_type:'checklist', fix:'Automated onboarding checklist with milestone triggers', fix_detail:'Build a 5-step onboarding checklist triggered on signup. Customers who complete all 5 steps have 4x lower churn rate.', owner:'CS Team' },
+    { id:'l2', type:'drain', title:'Single contact — no team adoption', count:14, revenue_impact:'€126k at risk', avg_tickets:12, urgency:'High', fix_type:'playbook', fix:'Champion expansion playbook', fix_detail:'Identify and engage a second stakeholder within first 30 days. Multi-contact accounts churn at 3x lower rate.', owner:'CS + Sales' },
+    { id:'l3', type:'drain', title:'Technical integration issues', count:8, revenue_impact:'€72k at risk', avg_tickets:16, urgency:'Medium', fix_type:'video', fix:'Video explainer series for top 5 integration scenarios', fix_detail:'Record 5 x 3-minute setup videos for most common integrations. Reduces integration tickets by estimated 60%.', owner:'Product Team' },
+    { id:'l4', type:'quickwin', title:'Low product usage after month 3', count:9, revenue_impact:'€81k churn risk', avg_tickets:3, urgency:'Medium', fix_type:'playbook', fix:'Re-engagement sequence at 60-day low usage mark', fix_detail:'Trigger automated re-engagement when weekly logins drop below 2. Early intervention recovers 40% of at-risk accounts.', owner:'CS Team' },
+    { id:'l5', type:'drain', title:'Feature confusion — reporting module', count:4, revenue_impact:'€36k at risk', avg_tickets:9, urgency:'Low', fix_type:'faq', fix:'In-app tooltips and FAQ for reporting module', fix_detail:'Add contextual help to the 3 most-asked-about report types. Estimated 80% reduction in reporting tickets.', owner:'Product Team' },
+  ],
+  fixes: [
+    { id:'f1', segment:'Diamond', title:'Fix integration setup friction', accounts:10, current_cost:'11.4 tickets/mo avg', after_cost:'~2.5 tickets/mo', value:'€134k margin recovery', effort:'Medium', actions:[
+      { step:'Record 3 video walkthroughs for top integration scenarios', owner:'Product', timeframe:'2 weeks' },
+      { step:'Add interactive field mapping wizard to onboarding flow', owner:'Engineering', timeframe:'4 weeks' },
+      { step:'Add glossary and tooltip layer on all dashboard metrics', owner:'Product', timeframe:'1 week' },
+    ]},
+    { id:'f2', segment:'Diamond', title:'Fix data mapping confusion', accounts:7, current_cost:'8.2 tickets/mo avg', after_cost:'~1.8 tickets/mo', value:'€89k margin recovery', effort:'Low', actions:[
+      { step:'Build interactive CSV field mapping guide', owner:'Product', timeframe:'1 week' },
+      { step:'Add example data templates for each data source type', owner:'CS', timeframe:'3 days' },
+    ]},
+    { id:'f3', segment:'Quick Win', title:'Unlock expansion — Starter → Growth upgrade', accounts:18, current_cost:'€18k avg LTV', after_cost:'€36k avg LTV', value:'€162k additional ARR', effort:'Low', actions:[
+      { step:'Identify 18 Starter accounts actively using Growth-tier features', owner:'Sales', timeframe:'1 day' },
+      { step:'Send targeted upgrade sequence with feature comparison', owner:'Sales', timeframe:'1 week' },
+      { step:'Offer 30-day Growth trial to highest-usage Starter accounts', owner:'Sales', timeframe:'2 days' },
+    ]},
+    { id:'f4', segment:'Quick Win', title:'Unlock expansion — exec sponsor engagement', accounts:4, current_cost:'No budget authority', after_cost:'Budget approved', value:'€72k additional ARR', effort:'Medium', actions:[
+      { step:'Create executive briefing template for champion to share upward', owner:'CS', timeframe:'3 days' },
+      { step:'Schedule exec QBR for top 4 accounts', owner:'CS + Sales', timeframe:'2 weeks' },
+    ]},
+  ],
   champions: {
-    avg_ltv: 74000, avg_tickets: 2.1, avg_time_to_value: 18, expansion_rate: 82,
-    shared_traits: ['VP Sales or RevOps champion from day one','Connected CRM + billing within first week','Attended onboarding call with 3+ team members','Used product daily within first 14 days','Proactively introduced exec sponsor'],
-    insight: '14 customers generate 71% of total revenue. They share a consistent pattern: fast time to value, multi-threaded adoption, and a VP-level champion who drove internal buy-in from the start.',
-  },
-  diamonds: {
-    avg_ltv: 61000, avg_tickets: 11.4, avg_time_to_value: 34, expansion_rate: 58,
-    ticket_topics: [
-      { topic:'Integration setup', pct:42, fix:'Step-by-step integration guides with video walkthroughs' },
-      { topic:'Data mapping confusion', pct:31, fix:'Interactive field mapping wizard in onboarding flow' },
-      { topic:'Report interpretation', pct:27, fix:'Glossary and tooltip layer on all dashboard metrics' },
-    ],
-    pathway_insight: 'Diamonds have the revenue profile of Champions but 5x the support cost. The gap is almost entirely driven by onboarding friction — they never got a proper setup. Fix the first 30 days and most Diamonds become Champions.',
-    potential_value: '€134k in additional margin if 10 Diamonds move to Champion-level support cost',
-  },
-  drains: {
-    avg_ltv: 9000, avg_tickets: 14.2,
-    clusters: [
-      { topic:'Onboarding never completed', count:19, pct:42, avg_tickets:18, revenue_impact:'€171k at risk', fix:'Automated onboarding checklist with milestone triggers', fix_type:'checklist', urgency:'High' },
-      { topic:'Single contact, no team adoption', count:14, pct:31, avg_tickets:12, revenue_impact:'€126k at risk', fix:'Champion expansion playbook — identify and engage a second stakeholder', fix_type:'playbook', urgency:'High' },
-      { topic:'Technical integration issues', count:8, pct:18, avg_tickets:16, revenue_impact:'€72k at risk', fix:'Video explainer series for top 5 integration scenarios', fix_type:'video', urgency:'Medium' },
-      { topic:'Feature confusion — reporting', count:4, pct:9, avg_tickets:9, revenue_impact:'€36k at risk', fix:'In-app tooltips and FAQ for reporting module', fix_type:'faq', urgency:'Low' },
-    ],
-    total_at_risk: '€405k',
-    recoverable: 12,
-    recovery_value: '€108k',
-  },
-  quickwins: {
-    avg_ltv: 18000, avg_tickets: 2.8, expansion_rate: 22,
-    blockers: [
-      { blocker:'On Starter plan — missing key features driving expansion', count:18, fix:'Targeted upgrade campaign highlighting Growth features they\'re missing', potential:'€162k ARR if 18 move to Growth plan' },
-      { blocker:'Low product usage after month 3', count:9, fix:'Re-engagement sequence triggered at 60-day low usage mark', potential:'€81k ARR at risk of churn' },
-      { blocker:'No exec sponsor — champion is junior', count:4, fix:'Executive briefing template for champion to share upward', potential:'€72k ARR if 4 unlock budget approval' },
-    ],
-    expansion_potential: '€315k additional ARR if top blockers resolved',
+    avg_ltv:74000, avg_tickets:2.1, avg_time_to_value:18, expansion_rate:82,
+    shared_traits:['VP Sales or RevOps champion from day one','Connected CRM + billing within first week','Attended onboarding with 3+ team members','Used product daily within 14 days','Introduced exec sponsor proactively'],
+    at_risk: 2,
+    health_signals:['2 Champions have not logged in for 8+ days — flag for CS outreach','1 Champion contact changed role — confirm new champion immediately'],
   },
 }
 
-const FIX_ICON: Record<string, any> = { checklist: CheckCircle, playbook: BookOpen, video: Video, faq: FileText }
-const URGENCY_STYLE: Record<string, string> = { High:'bg-red-500/15 text-red-400 border-red-500/30', Medium:'bg-amber-500/15 text-amber-400 border-amber-500/30', Low:'bg-slate-500/15 text-slate-400 border-slate-500/30' }
+const FIX_ICON: Record<string,any> = { checklist:CheckCircle, playbook:BookOpen, video:Video, faq:FileText }
+const URGENCY_STYLE: Record<string,string> = {
+  High:'bg-red-500/15 text-red-400 border border-red-500/30',
+  Medium:'bg-amber-500/15 text-amber-400 border border-amber-500/30',
+  Low:'bg-slate-700/50 text-slate-400 border border-slate-600',
+}
+const EFFORT_STYLE: Record<string,string> = {
+  Low:'bg-green-500/15 text-green-400',
+  Medium:'bg-amber-500/15 text-amber-400',
+  High:'bg-red-500/15 text-red-400',
+}
+const SEGMENT_STYLE: Record<string,string> = {
+  Diamond:'bg-amber-500/15 text-amber-400 border border-amber-500/30',
+  'Quick Win':'bg-blue-500/15 text-blue-400 border border-blue-500/30',
+}
 
 function StatCard({ icon:Icon, label, value, sub, color='teal' }: any) {
-  const c: Record<string,string> = { teal:'text-teal-400', amber:'text-amber-400', red:'text-red-400', indigo:'text-indigo-400', green:'text-green-400', blue:'text-blue-400' }
+  const c: Record<string,string> = { teal:'text-teal-400', amber:'text-amber-400', red:'text-red-400', indigo:'text-indigo-400', green:'text-green-400', blue:'text-blue-400', slate:'text-slate-400' }
   return (
     <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
       <div className="flex items-center gap-2 mb-2"><Icon size={14} className={c[color]}/><span className="text-xs text-slate-500">{label}</span></div>
@@ -56,102 +71,72 @@ function StatCard({ icon:Icon, label, value, sub, color='teal' }: any) {
   )
 }
 
-function SectionHeader({ title, sub }: { title: string; sub: string }) {
-  return (
-    <div className="flex items-start gap-3 mb-4">
-      <div className="flex-1">
-        <h3 className="text-base font-bold text-white mb-0.5">{title}</h3>
-        <p className="text-xs text-slate-400">{sub}</p>
-      </div>
-    </div>
-  )
-}
-
 export default function ProfitMatrix() {
   const [unlocked, setUnlocked] = useState(false)
-  const [activeSection, setActiveSection] = useState<string>('overview')
+  const [activeSection, setActiveSection] = useState('snapshot')
+  const [expandedFix, setExpandedFix] = useState<string|null>(null)
+  const [expandedLeak, setExpandedLeak] = useState<string|null>(null)
   const D = DATA
 
-  // ── LOCKED STATE ──────────────────────────────────────────────────────────
+  // ── LOCKED ───────────────────────────────────────────────────────────────
   if (!unlocked) {
     return (
       <div>
         <div className="mb-5">
           <h2 className="text-lg font-bold text-white mb-1">Profit Matrix</h2>
-          <p className="text-slate-400 text-sm">Understand the true profitability of every customer — and exactly what to do about it.</p>
+          <p className="text-slate-400 text-sm">Understand where your revenue is leaking — and exactly what to do about it.</p>
         </div>
-
-        {/* Teaser stats — partially visible */}
         <div className="grid grid-cols-4 gap-3 mb-6">
-          <div className="bg-teal-500/5 border border-teal-500/20 rounded-xl p-4">
-            <p className="text-xs text-slate-500 mb-1">Champion customers</p>
-            <p className="text-2xl font-bold text-teal-400">14</p>
-            <p className="text-xs text-slate-500">of 100 total</p>
-          </div>
-          <div className="bg-teal-500/5 border border-teal-500/20 rounded-xl p-4">
-            <p className="text-xs text-slate-500 mb-1">Revenue from Champions</p>
-            <p className="text-2xl font-bold text-teal-400">71%</p>
-            <p className="text-xs text-slate-500">of total LTV</p>
-          </div>
-          <div className="bg-red-500/5 border border-red-500/20 rounded-xl p-4">
-            <p className="text-xs text-slate-500 mb-1">Drain customers</p>
-            <p className="text-2xl font-bold text-red-400">45</p>
-            <p className="text-xs text-slate-500">net-negative accounts</p>
-          </div>
-          <div className="bg-red-500/5 border border-red-500/20 rounded-xl p-4">
-            <p className="text-xs text-slate-500 mb-1">Revenue at risk</p>
-            <p className="text-2xl font-bold text-red-400">€405k</p>
-            <p className="text-xs text-slate-500">from drain accounts</p>
-          </div>
+          {[
+            { label:'Champion customers', value:'14', sub:'generate 71% of revenue', color:'border-teal-500/20 bg-teal-500/5', text:'text-teal-400' },
+            { label:'Revenue concentration', value:'71%', sub:'from top 14 accounts', color:'border-teal-500/20 bg-teal-500/5', text:'text-teal-400' },
+            { label:'Net-negative accounts', value:'45', sub:'costing more than they generate', color:'border-red-500/20 bg-red-500/5', text:'text-red-400' },
+            { label:'Revenue at risk', value:'€405k', sub:'from drain accounts', color:'border-red-500/20 bg-red-500/5', text:'text-red-400' },
+          ].map(s => (
+            <div key={s.label} className={`border ${s.color} rounded-xl p-4`}>
+              <p className="text-xs text-slate-500 mb-1">{s.label}</p>
+              <p className={`text-2xl font-bold ${s.text}`}>{s.value}</p>
+              <p className="text-xs text-slate-500">{s.sub}</p>
+            </div>
+          ))}
         </div>
 
-        {/* Blurred preview */}
         <div className="relative rounded-2xl overflow-hidden mb-6">
-          <div className="blur-sm pointer-events-none select-none opacity-40">
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              {[['Champions','High LTV · Low tickets','14','teal'],['Diamonds','High LTV · High tickets','10','amber'],['Quick Wins','Lower LTV · Low tickets','31','blue'],['Drains','Low LTV · High tickets','45','red']].map(([label,desc,count,color])=>(
-                <div key={label} className={`border border-${color}-500/40 bg-${color}-500/5 rounded-xl p-4`}>
-                  <div className="flex justify-between mb-2">
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full bg-${color}-500 text-white`}>{label}</span>
-                    <span className={`text-lg font-bold text-${color}-400`}>{count}</span>
-                  </div>
-                  <p className="text-xs text-slate-400 mb-3">{desc}</p>
-                  <div className="h-2 bg-slate-700 rounded-full"><div className={`h-full bg-${color}-500 rounded-full w-3/4`}/></div>
-                </div>
-              ))}
-            </div>
+          {/* Blurred preview */}
+          <div className="blur-sm pointer-events-none select-none opacity-35 p-5 bg-slate-800/40 border border-slate-700 rounded-2xl space-y-3">
+            {['Fix onboarding for 19 drain accounts — €171k at risk','Reduce integration friction for 10 Diamonds — €134k in recoverable margin','Upgrade campaign for 18 Quick Win accounts — €162k additional ARR'].map((a,i) => (
+              <div key={i} className="flex items-center gap-3 bg-slate-900/60 rounded-xl p-3">
+                <span className="w-6 h-6 bg-teal-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">{i+1}</span>
+                <p className="text-sm text-slate-300">{a}</p>
+              </div>
+            ))}
           </div>
-
-          {/* Unlock overlay */}
-          <div className="absolute inset-0 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm rounded-2xl">
-            <div className="text-center px-8 py-10 max-w-md">
-              <div className="w-16 h-16 bg-teal-500/10 border border-teal-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Lock size={28} className="text-teal-400"/>
+          {/* Overlay */}
+          <div className="absolute inset-0 flex items-center justify-center bg-slate-900/70 backdrop-blur-sm rounded-2xl">
+            <div className="text-center px-8 py-8 max-w-md">
+              <div className="w-14 h-14 bg-teal-500/10 border border-teal-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Lock size={26} className="text-teal-400"/>
               </div>
               <h3 className="text-xl font-bold text-white mb-2">Unlock Profit Matrix</h3>
-              <p className="text-slate-400 text-sm mb-2">
-                45 of your customers are net-negative when support cost is factored in. Profit Matrix shows you exactly who they are, why they're draining your margin, and what to fix first.
-              </p>
-              <p className="text-teal-400 text-sm font-semibold mb-6">Available on Growth plan · €99/month</p>
-              <button onClick={() => setUnlocked(true)}
-                className="bg-teal-500 hover:bg-teal-400 text-white font-bold px-8 py-3 rounded-xl transition-colors w-full mb-3">
+              <p className="text-slate-400 text-sm mb-2">See exactly where your revenue is leaking, which customers are worth fixing, and the specific actions that will have the biggest impact on your margin.</p>
+              <p className="text-teal-400 text-sm font-semibold mb-5">Available on Growth plan · €99/month</p>
+              <button onClick={() => setUnlocked(true)} className="bg-teal-500 hover:bg-teal-400 text-white font-bold px-8 py-3 rounded-xl transition-colors w-full mb-2">
                 Unlock Profit Matrix →
               </button>
-              <p className="text-xs text-slate-500">Demo mode — click to preview full analysis</p>
+              <p className="text-xs text-slate-500">Demo mode — click to preview</p>
             </div>
           </div>
         </div>
 
-        {/* Feature list */}
         <div className="grid md:grid-cols-2 gap-3">
           {[
-            ['Champions deep-dive', 'Understand exactly what makes your 14 best customers tick — and how to find more of them.'],
-            ['Diamonds to Champions pathway', 'Identify which high-value customers are one intervention away from becoming your most profitable accounts.'],
-            ['Drain diagnosis', 'AI clusters your drain customers by ticket topic and surfaces the 3 fixable problems costing you the most.'],
-            ['Quick Wins acceleration', 'Identify the expansion blockers stopping 31 easy-to-serve customers from growing with you.'],
+            ['Revenue Snapshot', 'Your full profitability picture — where revenue is concentrated, what\'s at risk, and the three actions with the biggest impact.'],
+            ['Where is revenue leaking?', 'Every account that\'s costing more than it generates, ranked by impact, with specific fixes attached.'],
+            ['What can we fix?', 'The highest-value interventions across Diamonds and Quick Wins — with effort ratings, owners, and step-by-step action plans.'],
+            ['Who to protect', 'Your 14 Champion accounts — what makes them tick, early warning signals, and what to do if any show signs of risk.'],
           ].map(([title, desc]) => (
             <div key={title} className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-4 flex items-start gap-3">
-              <Lock size={14} className="text-slate-600 flex-shrink-0 mt-0.5"/>
+              <Lock size={13} className="text-slate-600 flex-shrink-0 mt-0.5"/>
               <div>
                 <p className="text-sm font-semibold text-slate-300 mb-0.5">{title}</p>
                 <p className="text-xs text-slate-500">{desc}</p>
@@ -163,13 +148,12 @@ export default function ProfitMatrix() {
     )
   }
 
-  // ── UNLOCKED STATE ────────────────────────────────────────────────────────
+  // ── UNLOCKED ─────────────────────────────────────────────────────────────
   const sections = [
-    { id:'overview', label:'Overview' },
-    { id:'champions', label:'Champions' },
-    { id:'diamonds', label:'Diamonds → Champions' },
-    { id:'drains', label:'Drain Diagnosis' },
-    { id:'quickwins', label:'Quick Wins' },
+    { id:'snapshot', label:'Revenue Snapshot' },
+    { id:'leaks',    label:'Where is revenue leaking?' },
+    { id:'fixes',    label:'What can we fix?' },
+    { id:'protect',  label:'Who to protect' },
   ]
 
   return (
@@ -180,7 +164,7 @@ export default function ProfitMatrix() {
             <h2 className="text-lg font-bold text-white">Profit Matrix</h2>
             <span className="text-xs bg-teal-500 text-white px-2 py-0.5 rounded-full font-semibold">Growth</span>
           </div>
-          <p className="text-slate-400 text-sm">Full profitability breakdown across all {D.summary.total} customers — with AI-identified fixes.</p>
+          <p className="text-slate-400 text-sm">Full profitability breakdown — with AI-identified actions ranked by revenue impact.</p>
         </div>
       </div>
 
@@ -194,65 +178,210 @@ export default function ProfitMatrix() {
         ))}
       </div>
 
-      {/* ── OVERVIEW ── */}
-      {activeSection === 'overview' && (
+      {/* ── REVENUE SNAPSHOT ── */}
+      {activeSection === 'snapshot' && (
         <div className="space-y-5">
-          <div className="bg-teal-500/10 border border-teal-500/30 rounded-2xl p-5">
-            <p className="text-sm font-semibold text-teal-400 mb-1">The Revenue Reality</p>
-            <p className="text-sm text-slate-300 leading-relaxed">
-              <span className="text-white font-semibold">14 customers generate 71% of your total revenue</span> — and share a consistent profile. Meanwhile, <span className="text-red-400 font-semibold">45 customers are net-negative</span> when support cost is factored against LTV. This is not unusual for B2B SaaS at this stage — but knowing it is the first step to fixing it.
-            </p>
+          {/* Top 3 actions */}
+          <div className="bg-slate-800/40 border border-teal-500/20 rounded-2xl p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <Zap size={15} className="text-teal-400"/>
+              <p className="text-sm font-bold text-white">Your top 3 actions right now</p>
+              <span className="text-xs text-slate-500 ml-auto">Ranked by revenue impact</span>
+            </div>
+            <div className="space-y-3">
+              {D.top_actions.map(a => (
+                <div key={a.rank} className="flex items-center gap-3 bg-slate-900/60 rounded-xl p-3">
+                  <span className="w-7 h-7 bg-teal-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">{a.rank}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-white">{a.action}</p>
+                    <p className="text-xs text-slate-500">{a.detail}</p>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${a.urgency==='high'?'bg-red-500/15 text-red-400':'bg-amber-500/15 text-amber-400'}`}>{a.value}</span>
+                    <span className="text-xs text-slate-500 hidden md:block">{a.owner}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              { label:'Champions', desc:'High LTV · Low tickets', count:D.summary.champions, ltv:'€74k avg', tickets:'2.1 avg', color:'teal', action:'Clone these — they are your ICP' },
-              { label:'Diamonds', desc:'High LTV · High tickets', count:D.summary.diamonds, ltv:'€61k avg', tickets:'11.4 avg', color:'amber', action:'Fix the friction — they can become Champions' },
-              { label:'Quick Wins', desc:'Lower LTV · Low tickets', count:D.summary.quickwins, ltv:'€18k avg', tickets:'2.8 avg', color:'blue', action:'Remove expansion blockers — grow them up' },
-              { label:'Drains', desc:'Low LTV · High tickets', count:D.summary.drains, ltv:'€9k avg', tickets:'14.2 avg', color:'red', action:'Diagnose and fix — or stop targeting this profile' },
-            ].map(q => {
-              const styles: Record<string,{border:string;bg:string;badge:string;text:string}> = {
-                teal:  {border:'border-teal-500/40',  bg:'bg-teal-500/5',  badge:'bg-teal-500 text-white',  text:'text-teal-400'},
-                amber: {border:'border-amber-500/40', bg:'bg-amber-500/5', badge:'bg-amber-500 text-white', text:'text-amber-400'},
-                blue:  {border:'border-blue-500/40',  bg:'bg-blue-500/5',  badge:'bg-blue-500 text-white',  text:'text-blue-400'},
-                red:   {border:'border-red-500/40',   bg:'bg-red-500/5',   badge:'bg-red-500 text-white',   text:'text-red-400'},
-              }
-              const st = styles[q.color]
-              return (
-                <div key={q.label} className={`border ${st.border} ${st.bg} rounded-xl p-4`}>
+          {/* Summary stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <StatCard icon={Star} label="Champion accounts" value="14" sub="generate 71% of revenue" color="teal"/>
+            <StatCard icon={DollarSign} label="Revenue at risk" value="€405k" sub="from 45 drain accounts" color="red"/>
+            <StatCard icon={TrendingUp} label="Recoverable margin" value="€134k" sub="if Diamonds fixed" color="amber"/>
+            <StatCard icon={Zap} label="Expansion potential" value="€315k" sub="from Quick Wins" color="blue"/>
+          </div>
+
+          {/* Matrix overview */}
+          <div>
+            <p className="text-xs text-slate-500 mb-3">Full profitability breakdown — click a section to go deeper</p>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { label:'Champions', desc:'High LTV · Low support cost', count:14, ltv:'€74k avg', tickets:'2.1/mo', color:'teal', badge:'bg-teal-500 text-white', border:'border-teal-500/30', bg:'bg-teal-500/5', text:'text-teal-400', insight:'Your best customers. Clone them via Generate.', section:'protect' },
+                { label:'Diamonds', desc:'High LTV · High support cost', count:10, ltv:'€61k avg', tickets:'11.4/mo', color:'amber', badge:'bg-amber-500 text-white', border:'border-amber-500/30', bg:'bg-amber-500/5', text:'text-amber-400', insight:'One intervention away from Champion status.', section:'fixes' },
+                { label:'Quick Wins', desc:'Lower LTV · Low support cost', count:31, ltv:'€18k avg', tickets:'2.8/mo', color:'blue', badge:'bg-blue-500 text-white', border:'border-blue-500/30', bg:'bg-blue-500/5', text:'text-blue-400', insight:'Easy to serve — remove the expansion blockers.', section:'fixes' },
+                { label:'Drains', desc:'Low LTV · High support cost', count:45, ltv:'€9k avg', tickets:'14.2/mo', color:'red', badge:'bg-red-500 text-white', border:'border-red-500/30', bg:'bg-red-500/5', text:'text-red-400', insight:'€405k at risk. Fix the pattern or stop targeting this profile.', section:'leaks' },
+              ].map(q => (
+                <button key={q.label} onClick={() => setActiveSection(q.section)}
+                  className={`border ${q.border} ${q.bg} rounded-xl p-4 text-left hover:ring-1 hover:ring-current transition-all`}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${st.badge}`}>{q.label}</span>
-                    <span className={`text-2xl font-bold ${st.text}`}>{q.count}</span>
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${q.badge}`}>{q.label}</span>
+                    <span className={`text-2xl font-bold ${q.text}`}>{q.count}</span>
                   </div>
                   <p className="text-xs text-slate-400 mb-2">{q.desc}</p>
-                  <div className="flex gap-3 mb-2">
+                  <div className="flex gap-4 mb-2">
                     <div><p className="text-xs text-slate-500">Avg LTV</p><p className="text-xs font-semibold text-white">{q.ltv}</p></div>
                     <div><p className="text-xs text-slate-500">Tickets/mo</p><p className="text-xs font-semibold text-white">{q.tickets}</p></div>
                   </div>
-                  <p className={`text-xs font-medium ${st.text}`}>→ {q.action}</p>
-                </div>
-              )
-            })}
-          </div>
-
-          <div className="grid grid-cols-3 gap-3">
-            <StatCard icon={DollarSign} label="Revenue at risk" value="€405k" sub="from 45 drain accounts" color="red"/>
-            <StatCard icon={TrendingUp} label="Recoverable LTV" value="€108k" sub="if top drains fixed" color="amber"/>
-            <StatCard icon={Star} label="Diamond opportunity" value="€134k" sub="margin if Diamonds → Champions" color="teal"/>
+                  <div className="flex items-center gap-1">
+                    <p className={`text-xs font-medium ${q.text}`}>→ {q.insight}</p>
+                    <ChevronRight size={11} className={q.text}/>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}
 
-      {/* ── CHAMPIONS ── */}
-      {activeSection === 'champions' && (
-        <div className="space-y-5">
-          <SectionHeader title="Champions — your 14 best customers" sub="High LTV, low support cost, high expansion rate. These are the accounts to clone." />
+      {/* ── WHERE IS REVENUE LEAKING ── */}
+      {activeSection === 'leaks' && (
+        <div className="space-y-4">
+          <div className="bg-red-500/5 border border-red-500/20 rounded-2xl p-4 flex items-start gap-3">
+            <AlertTriangle size={15} className="text-red-400 flex-shrink-0 mt-0.5"/>
+            <p className="text-sm text-slate-300"><span className="text-white font-semibold">€486k total revenue at risk</span> across 54 accounts. Below are every leak ranked by impact — each with a specific fix, an owner, and an estimated recovery value.</p>
+          </div>
 
-          <div className="grid grid-cols-4 gap-3">
-            <StatCard icon={DollarSign} label="Average LTV" value="€74k" sub="vs €20k average" color="teal"/>
-            <StatCard icon={MessageSquare} label="Avg tickets/mo" value="2.1" sub="vs 14.2 for drains" color="teal"/>
-            <StatCard icon={TrendingUp} label="Expansion rate" value="82%" sub="expand within 6 months" color="green"/>
-            <StatCard icon={Users} label="Time to value" value="18 days" sub="vs 34 days for diamonds" color="teal"/>
+          <div className="space-y-3">
+            {D.leaks.map((leak, i) => {
+              const FixIcon = FIX_ICON[leak.fix_type] || Zap
+              const isExpanded = expandedLeak === leak.id
+              return (
+                <div key={leak.id} className="bg-slate-800/40 border border-slate-700 rounded-2xl overflow-hidden">
+                  <button className="w-full p-4 text-left" onClick={() => setExpandedLeak(isExpanded ? null : leak.id)}>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-start gap-3 flex-1 min-w-0">
+                        <span className="w-6 h-6 bg-slate-700 rounded-full flex items-center justify-center text-xs font-bold text-slate-400 flex-shrink-0 mt-0.5">{i+1}</span>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <p className="text-sm font-bold text-white">{leak.title}</p>
+                            <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${URGENCY_STYLE[leak.urgency]}`}>{leak.urgency}</span>
+                            <span className={`text-xs px-1.5 py-0.5 rounded-full ${leak.type==='drain'?'bg-red-500/10 text-red-400':'bg-amber-500/10 text-amber-400'}`}>{leak.type==='drain'?'Drain':'Quick Win at risk'}</span>
+                          </div>
+                          <p className="text-xs text-slate-400">{leak.count} accounts · avg {leak.avg_tickets} tickets/mo · Owner: {leak.owner}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 flex-shrink-0">
+                        <p className="text-sm font-bold text-red-400">{leak.revenue_impact}</p>
+                        <ChevronRight size={14} className={`text-slate-500 transition-transform ${isExpanded?'rotate-90':''}`}/>
+                      </div>
+                    </div>
+                  </button>
+
+                  {isExpanded && (
+                    <div className="border-t border-slate-700/50 p-4">
+                      <div className="bg-teal-500/5 border border-teal-500/20 rounded-xl p-3 flex items-start gap-2">
+                        <FixIcon size={13} className="text-teal-400 flex-shrink-0 mt-0.5"/>
+                        <div>
+                          <p className="text-xs text-teal-400 font-semibold mb-1">{leak.fix}</p>
+                          <p className="text-xs text-slate-300">{leak.fix_detail}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── WHAT CAN WE FIX ── */}
+      {activeSection === 'fixes' && (
+        <div className="space-y-4">
+          <div className="bg-teal-500/5 border border-teal-500/20 rounded-2xl p-4">
+            <p className="text-sm text-slate-300"><span className="text-teal-400 font-semibold">€457k in recoverable value</span> across 4 targeted interventions. Each fix has a clear owner, effort rating, and step-by-step action plan.</p>
+          </div>
+
+          <div className="space-y-3">
+            {D.fixes.map(fix => {
+              const isExpanded = expandedFix === fix.id
+              return (
+                <div key={fix.id} className="bg-slate-800/40 border border-slate-700 rounded-2xl overflow-hidden">
+                  <button className="w-full p-4 text-left" onClick={() => setExpandedFix(isExpanded ? null : fix.id)}>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <p className="text-sm font-bold text-white">{fix.title}</p>
+                          <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${SEGMENT_STYLE[fix.segment]}`}>{fix.segment}</span>
+                          <span className={`text-xs px-1.5 py-0.5 rounded-full ${EFFORT_STYLE[fix.effort]}`}>{fix.effort} effort</span>
+                        </div>
+                        <p className="text-xs text-slate-400">{fix.accounts} accounts · Tickets: {fix.current_cost} → {fix.after_cost}</p>
+                      </div>
+                      <div className="flex items-center gap-3 flex-shrink-0">
+                        <p className="text-sm font-bold text-teal-400">{fix.value}</p>
+                        <ChevronRight size={14} className={`text-slate-500 transition-transform ${isExpanded?'rotate-90':''}`}/>
+                      </div>
+                    </div>
+                  </button>
+
+                  {isExpanded && (
+                    <div className="border-t border-slate-700/50 p-4">
+                      <p className="text-xs text-slate-500 font-semibold mb-3">Step-by-step action plan</p>
+                      <div className="space-y-2">
+                        {fix.actions.map((action, i) => (
+                          <div key={i} className="flex items-start gap-3 bg-slate-900/50 rounded-lg p-3">
+                            <span className="w-5 h-5 bg-teal-500/20 rounded-full flex items-center justify-center text-teal-400 text-xs font-bold flex-shrink-0 mt-0.5">{i+1}</span>
+                            <div className="flex-1">
+                              <p className="text-xs text-slate-300">{action.step}</p>
+                            </div>
+                            <div className="text-right flex-shrink-0">
+                              <p className="text-xs text-slate-500">{action.owner}</p>
+                              <p className="text-xs text-teal-400">{action.timeframe}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── WHO TO PROTECT ── */}
+      {activeSection === 'protect' && (
+        <div className="space-y-5">
+          <div className="bg-teal-500/10 border border-teal-500/30 rounded-2xl p-5">
+            <p className="text-sm font-semibold text-teal-400 mb-1">14 accounts generate 71% of your revenue</p>
+            <p className="text-sm text-slate-300 leading-relaxed">These are your Champions. Losing one is not a small churn event — it is a material revenue event. The goal here is to understand what makes them exceptional, catch any early warning signs, and ensure your CS motion is protecting them actively.</p>
+          </div>
+
+          {D.champions.at_risk > 0 && (
+            <div className="bg-amber-500/5 border border-amber-500/30 rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <AlertTriangle size={14} className="text-amber-400"/>
+                <p className="text-sm font-bold text-amber-400">{D.champions.at_risk} Champion accounts showing early warning signals</p>
+              </div>
+              <div className="space-y-2">
+                {D.champions.health_signals.map(signal => (
+                  <div key={signal} className="flex items-start gap-2">
+                    <AlertTriangle size={11} className="text-amber-400 flex-shrink-0 mt-0.5"/>
+                    <p className="text-xs text-slate-300">{signal}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <StatCard icon={DollarSign} label="Avg Champion LTV" value="€74k" sub="vs €20k average" color="teal"/>
+            <StatCard icon={MessageSquare} label="Avg tickets/mo" value="2.1" sub="low maintenance" color="teal"/>
+            <StatCard icon={TrendingUp} label="Expansion rate" value="82%" sub="within 6 months" color="green"/>
+            <StatCard icon={Users} label="Time to value" value="18 days" sub="fast onboarding" color="teal"/>
           </div>
 
           <div className="bg-slate-800/40 border border-teal-500/20 rounded-2xl p-5">
@@ -260,163 +389,19 @@ export default function ProfitMatrix() {
             <div className="space-y-2">
               {D.champions.shared_traits.map(trait => (
                 <div key={trait} className="flex items-start gap-2">
-                  <CheckCircle size={13} className="text-teal-500 flex-shrink-0 mt-0.5"/>
+                  <CheckCircle size={12} className="text-teal-500 flex-shrink-0 mt-0.5"/>
                   <p className="text-xs text-slate-300">{trait}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="bg-teal-500/5 border border-teal-500/30 rounded-2xl p-5">
-            <p className="text-sm text-slate-300 leading-relaxed">{D.champions.insight}</p>
-          </div>
-
           <div className="bg-slate-800/40 border border-slate-700 rounded-2xl p-4">
-            <p className="text-xs text-slate-400 font-semibold mb-3">What this means for targeting</p>
-            <p className="text-xs text-slate-300 mb-3">Your Champion profile is the input for Generate. Every net-new prospect SignalOps surfaces is matched against these 14 accounts — not your average customer. This is why the lookalike quality is fundamentally different from any enrichment tool.</p>
-            <button onClick={() => setActiveSection('drains')} className="text-xs text-teal-400 font-semibold hover:underline flex items-center gap-1">
-              See what's holding back your other customers <ArrowRight size={12}/>
+            <p className="text-xs text-slate-500 font-semibold mb-2">What this means for targeting</p>
+            <p className="text-xs text-slate-300 mb-3">Every prospect SignalOps generates in the Generate tab is matched against these 14 accounts — not your average customer. This is why lookalike quality is fundamentally different from any enrichment tool.</p>
+            <button className="text-xs text-teal-400 font-semibold flex items-center gap-1 hover:underline">
+              View your Champion ICP profile <ArrowRight size={11}/>
             </button>
-          </div>
-        </div>
-      )}
-
-      {/* ── DIAMONDS → CHAMPIONS ── */}
-      {activeSection === 'diamonds' && (
-        <div className="space-y-5">
-          <SectionHeader title="Diamonds → Champions pathway" sub="10 customers with Champion-level revenue but 5x the support cost. Fix the friction, unlock the margin." />
-
-          <div className="grid grid-cols-3 gap-3">
-            <StatCard icon={DollarSign} label="Diamond avg LTV" value="€61k" sub="nearly Champion level" color="amber"/>
-            <StatCard icon={MessageSquare} label="Avg tickets/mo" value="11.4" sub="vs 2.1 for Champions" color="red"/>
-            <StatCard icon={Star} label="Margin opportunity" value="€134k" sub="if tickets match Champions" color="teal"/>
-          </div>
-
-          <div className="bg-amber-500/5 border border-amber-500/30 rounded-2xl p-4">
-            <p className="text-xs text-amber-400 font-semibold mb-2">AI insight</p>
-            <p className="text-xs text-slate-300 leading-relaxed">{D.diamonds.pathway_insight}</p>
-          </div>
-
-          <div>
-            <p className="text-xs text-slate-500 font-semibold mb-3">Top ticket topics across Diamond accounts — and how to fix them</p>
-            <div className="space-y-3">
-              {D.diamonds.ticket_topics.map((t, i) => (
-                <div key={t.topic} className="bg-slate-800/40 border border-slate-700 rounded-xl p-4">
-                  <div className="flex items-start justify-between gap-4 mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-amber-400 w-4">{i+1}</span>
-                      <p className="text-sm font-semibold text-white">{t.topic}</p>
-                    </div>
-                    <span className="text-xs font-bold text-amber-400 flex-shrink-0">{t.pct}% of tickets</span>
-                  </div>
-                  <div className="h-1.5 bg-slate-700 rounded-full mb-3">
-                    <div className="h-full bg-amber-500 rounded-full" style={{width:`${t.pct}%`}}/>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Zap size={12} className="text-teal-400 flex-shrink-0 mt-0.5"/>
-                    <p className="text-xs text-teal-400 font-medium">Fix: {t.fix}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-slate-800/40 border border-teal-500/30 rounded-2xl p-4">
-            <p className="text-xs text-slate-500 mb-1">Potential value of fixing Diamond friction</p>
-            <p className="text-lg font-bold text-teal-400">{D.diamonds.potential_value}</p>
-          </div>
-        </div>
-      )}
-
-      {/* ── DRAIN DIAGNOSIS ── */}
-      {activeSection === 'drains' && (
-        <div className="space-y-5">
-          <SectionHeader title="Drain diagnosis — 45 net-negative accounts" sub="AI has clustered your drain customers by ticket topic and identified the fixable problems costing you the most." />
-
-          <div className="grid grid-cols-3 gap-3">
-            <StatCard icon={AlertTriangle} label="Total at risk" value={D.drains.total_at_risk} sub="from 45 drain accounts" color="red"/>
-            <StatCard icon={CheckCircle} label="Recoverable accounts" value={D.drains.recoverable} sub="with targeted intervention" color="amber"/>
-            <StatCard icon={DollarSign} label="Recovery value" value={D.drains.recovery_value} sub="if top issue fixed" color="teal"/>
-          </div>
-
-          <div className="space-y-3">
-            {D.drains.clusters.map((cluster, i) => {
-              const FixIcon = FIX_ICON[cluster.fix_type] || Zap
-              return (
-                <div key={cluster.topic} className="bg-slate-800/40 border border-slate-700 rounded-2xl p-4">
-                  <div className="flex items-start justify-between gap-4 mb-3">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-bold text-red-400">#{i+1}</span>
-                        <p className="text-sm font-bold text-white">{cluster.topic}</p>
-                        <span className={`text-xs px-2 py-0.5 rounded-full border font-semibold ${URGENCY_STYLE[cluster.urgency]}`}>{cluster.urgency}</span>
-                      </div>
-                      <p className="text-xs text-slate-400">{cluster.count} accounts · {cluster.pct}% of drains · avg {cluster.avg_tickets} tickets/mo</p>
-                    </div>
-                    <div className="text-right flex-shrink-0">
-                      <p className="text-sm font-bold text-red-400">{cluster.revenue_impact}</p>
-                    </div>
-                  </div>
-                  <div className="h-1.5 bg-slate-700 rounded-full mb-3">
-                    <div className="h-full bg-red-500/60 rounded-full" style={{width:`${cluster.pct}%`}}/>
-                  </div>
-                  <div className="bg-teal-500/5 border border-teal-500/20 rounded-xl p-3 flex items-start gap-2">
-                    <FixIcon size={13} className="text-teal-400 flex-shrink-0 mt-0.5"/>
-                    <div>
-                      <p className="text-xs text-teal-400 font-semibold mb-0.5">Recommended fix</p>
-                      <p className="text-xs text-slate-300">{cluster.fix}</p>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-
-          <div className="bg-red-500/5 border border-red-500/20 rounded-2xl p-4">
-            <p className="text-xs text-red-400 font-semibold mb-2">Important</p>
-            <p className="text-xs text-slate-300">Fixing these issues does not just recover at-risk revenue — it frees CS capacity currently consumed by drain accounts, allowing your team to focus on Champions and Diamonds. Every hour saved from a drain customer is an hour reinvested in your most profitable accounts.</p>
-          </div>
-        </div>
-      )}
-
-      {/* ── QUICK WINS ── */}
-      {activeSection === 'quickwins' && (
-        <div className="space-y-5">
-          <SectionHeader title="Quick Wins acceleration — 31 accounts" sub="Low LTV but low support cost. Easy to serve, undermonetised. Remove the expansion blockers." />
-
-          <div className="grid grid-cols-3 gap-3">
-            <StatCard icon={Users} label="Quick Win accounts" value="31" sub="low ticket, low LTV" color="blue"/>
-            <StatCard icon={TrendingUp} label="Expansion rate" value="22%" sub="vs 82% for Champions" color="amber"/>
-            <StatCard icon={DollarSign} label="Expansion potential" value="€315k" sub="additional ARR if blockers fixed" color="teal"/>
-          </div>
-
-          <div className="space-y-3">
-            {D.quickwins.blockers.map((b, i) => (
-              <div key={b.blocker} className="bg-slate-800/40 border border-slate-700 rounded-2xl p-4">
-                <div className="flex items-start justify-between gap-4 mb-3">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-bold text-blue-400">#{i+1}</span>
-                      <p className="text-sm font-bold text-white">{b.blocker}</p>
-                    </div>
-                    <p className="text-xs text-slate-400">{b.count} accounts affected</p>
-                  </div>
-                  <p className="text-xs font-bold text-teal-400 flex-shrink-0 text-right">{b.potential}</p>
-                </div>
-                <div className="bg-blue-500/5 border border-blue-500/20 rounded-xl p-3 flex items-start gap-2">
-                  <Zap size={13} className="text-blue-400 flex-shrink-0 mt-0.5"/>
-                  <div>
-                    <p className="text-xs text-blue-400 font-semibold mb-0.5">Recommended action</p>
-                    <p className="text-xs text-slate-300">{b.fix}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="bg-teal-500/5 border border-teal-500/30 rounded-2xl p-4">
-            <p className="text-xs text-teal-400 font-semibold mb-2">The opportunity</p>
-            <p className="text-xs text-slate-300">Quick Win customers are your most efficient growth lever. They already trust you, they already use the product, and their support cost is low. The only thing standing between them and Champion status is a plan, a budget approval, or a feature they don't know exists yet. That's a solvable problem.</p>
           </div>
         </div>
       )}
