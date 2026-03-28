@@ -112,7 +112,7 @@ function DonutChart({ animate }: { animate: boolean }) {
   })
 
   return (
-    <div className="flex items-center w-full" style={{ gap: '28px', paddingLeft: '8px' }}>
+    <div className="flex items-center justify-center gap-16 w-full">
       <svg width="140" height="140" viewBox="0 0 160 160">
         <defs>
           {arcs.map(a => (
@@ -323,7 +323,7 @@ export default function ProfitMatrix() {
             style={{ background: 'rgba(15,23,42,0.5)' }}
           >
             <p className="text-xs text-slate-500 font-medium mb-3 uppercase tracking-wider">100 accounts by profitability</p>
-            <div className="flex-1 flex items-center">
+            <div className="flex-1 flex items-center justify-center">
               <DonutChart animate={chartAnimate} />
             </div>
           </div>
@@ -336,7 +336,7 @@ export default function ProfitMatrix() {
         >
           <div className="grid grid-cols-2">
             {/* Left: what's inside */}
-            <div className="p-5 flex flex-col justify-center" style={{ paddingLeft: '10%', paddingRight: '8%' }}>
+            <div className="p-5">
               <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-3">What you'll unlock</p>
               <div className="space-y-2.5">
                 {[
