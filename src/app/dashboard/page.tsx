@@ -50,14 +50,18 @@ function DashboardInner() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 style={{ flex: '1 1 0' }}
-                className={`flex items-center justify-center gap-2 py-4 text-sm font-medium border-b-2 transition-colors -mb-px whitespace-nowrap ${
-                  active
-                    ? 'border-teal-500 text-white'
-                    : 'border-transparent text-slate-500 hover:text-white'
+                className={`relative flex items-center justify-center gap-2 py-4 text-sm font-medium transition-colors -mb-px whitespace-nowrap ${
+                  active ? 'text-white' : 'text-slate-500 hover:text-white'
                 }`}
               >
                 <span className="text-base leading-none">{tab.emoji}</span>
                 {tab.label}
+                {active && (
+                  <span
+                    className="absolute bottom-0 left-1/2 -translate-x-1/2 rounded-full"
+                    style={{ height: '3px', width: '80%', background: '#14b8a6' }}
+                  />
+                )}
               </button>
             )
           })}
