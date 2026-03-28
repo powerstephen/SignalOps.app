@@ -329,63 +329,65 @@ export default function ProfitMatrix() {
           </div>
         </div>
 
-        {/* ROW 2: Unlock CTA (left) + Feature bullets (right) */}
+        {/* ROW 2: Single card — features left, unlock CTA right, subtle divider */}
         <div
-          className="rounded-xl overflow-hidden border border-slate-700/50"
+          className="rounded-xl border border-slate-700/50 relative overflow-hidden"
           style={{ background: 'rgba(15,23,42,0.5)' }}
         >
-
-          <div className="grid grid-cols-2 gap-0">
-            {/* Left: CTA */}
-            <div className="p-5 flex flex-col justify-between border-r border-slate-700/40">
-              <div>
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center mb-3"
-                  style={{ background: 'rgba(20,184,166,0.1)', border: '1px solid rgba(20,184,166,0.3)', boxShadow: '0 0 16px rgba(20,184,166,0.15)' }}
-                >
-                  <Lock size={18} className="text-teal-400"/>
-                </div>
-                <h3 className="text-base font-bold text-white mb-1.5">Unlock Profit Matrix</h3>
-                <p className="text-xs text-slate-400 leading-relaxed mb-3">
-                  See exactly which accounts are draining your margin, who's one fix away from Champion status, and the actions ranked by revenue impact.
-                </p>
-                <p className="text-xs text-teal-400 font-semibold mb-3">Growth plan · €99/month</p>
+          <div className="grid grid-cols-2">
+            {/* Left: what's inside */}
+            <div className="p-5">
+              <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-3">What you'll unlock</p>
+              <div className="space-y-2.5">
+                {[
+                  { icon: BarChart2, text: 'Full profitability breakdown across all 4 segments', color: 'text-teal-400', bg: 'rgba(20,184,166,0.1)', border: 'rgba(20,184,166,0.2)' },
+                  { icon: AlertTriangle, text: '5 revenue leaks — each with a named owner and fix', color: 'text-red-400', bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.2)' },
+                  { icon: Target, text: '4 interventions with step-by-step action plans', color: 'text-amber-400', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.2)' },
+                  { icon: Shield, text: 'Champion health monitoring & early warnings', color: 'text-blue-400', bg: 'rgba(59,130,246,0.1)', border: 'rgba(59,130,246,0.2)' },
+                ].map(({ icon: Icon, text, color, bg, border }) => (
+                  <div key={text} className="flex items-start gap-2.5">
+                    <div
+                      className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                      style={{ background: bg, border: `1px solid ${border}` }}
+                    >
+                      <Icon size={11} className={color}/>
+                    </div>
+                    <p className="text-xs text-slate-300 leading-relaxed">{text}</p>
+                  </div>
+                ))}
               </div>
-              <button
-                onClick={() => setUnlocked(true)}
-                className="w-full py-3 rounded-xl font-bold text-sm text-white transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-                style={{
-                  background: 'linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #0d9488 100%)',
-                  boxShadow: '0 4px 20px rgba(20,184,166,0.35), 0 1px 0 rgba(255,255,255,0.1) inset',
-                }}
-              >
-                <span className="flex items-center justify-center gap-2">
-                  <Sparkles size={13}/>
-                  Unlock Profit Matrix
-                  <ArrowRight size={13}/>
-                </span>
-              </button>
-              <p className="text-center text-xs text-slate-600 mt-1.5">Demo mode — click to preview</p>
             </div>
 
-            {/* Right: feature list */}
-            <div className="p-5 flex flex-col justify-center space-y-2.5">
-              {[
-                { icon: BarChart2, text: 'Full profitability breakdown across all 4 segments', color: 'text-teal-400', bg: 'rgba(20,184,166,0.1)', border: 'rgba(20,184,166,0.25)' },
-                { icon: AlertTriangle, text: '5 revenue leaks — each with a named owner and fix', color: 'text-red-400', bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.25)' },
-                { icon: Target, text: '4 interventions with step-by-step action plans', color: 'text-amber-400', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.25)' },
-                { icon: Shield, text: 'Champion health monitoring & early warnings', color: 'text-blue-400', bg: 'rgba(59,130,246,0.1)', border: 'rgba(59,130,246,0.25)' },
-              ].map(({ icon: Icon, text, color, bg, border }) => (
-                <div key={text} className="flex items-start gap-2.5">
-                  <div
-                    className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
-                    style={{ background: bg, border: `1px solid ${border}` }}
-                  >
-                    <Icon size={11} className={color}/>
-                  </div>
-                  <p className="text-xs text-slate-300 leading-relaxed">{text}</p>
-                </div>
-              ))}
+            {/* Subtle vertical divider — doesn't reach top or bottom */}
+            <div className="absolute left-1/2 top-6 bottom-6 w-px" style={{ background: 'linear-gradient(to bottom, transparent, rgba(20,184,166,0.25), transparent)' }}/>
+
+            {/* Right: CTA */}
+            <div className="p-5 flex flex-col justify-between">
+              <div>
+                <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-3">Get access</p>
+                <h3 className="text-base font-bold text-white mb-1.5">Unlock Profit Matrix</h3>
+                <p className="text-xs text-slate-400 leading-relaxed mb-3">
+                  See exactly which accounts are draining your margin, who's one fix away from Champion status, and every action ranked by revenue impact.
+                </p>
+                <p className="text-xs text-teal-400 font-semibold">Growth plan · €99/month</p>
+              </div>
+              <div className="mt-4">
+                <button
+                  onClick={() => setUnlocked(true)}
+                  className="w-full py-2.5 rounded-xl font-bold text-sm text-white transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
+                  style={{
+                    background: 'linear-gradient(135deg, #0d9488 0%, #14b8a6 100%)',
+                    boxShadow: '0 2px 12px rgba(20,184,166,0.25)',
+                  }}
+                >
+                  <span className="flex items-center justify-center gap-2">
+                    <Sparkles size={13}/>
+                    Unlock Profit Matrix
+                    <ArrowRight size={13}/>
+                  </span>
+                </button>
+                <p className="text-center text-xs text-slate-600 mt-1.5">Demo mode — click to preview</p>
+              </div>
             </div>
           </div>
         </div>
