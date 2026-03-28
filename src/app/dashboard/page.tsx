@@ -1,6 +1,5 @@
 'use client'
 import { useState } from 'react'
-import { Target, RefreshCw, Zap, Database, TrendingUp, BarChart2 } from 'lucide-react'
 import ICPProfile from '../components/ICPProfile'
 import RecoverTab from '../components/RecoverTab'
 import GenerateTab from '../components/GenerateTab'
@@ -12,16 +11,17 @@ import { ImportProvider } from '../context/ImportContext'
 
 type Tab = 'data' | 'icp' | 'profit' | 'recover' | 'generate' | 'accelerate'
 
+const tabs: { id: Tab; label: string; emoji: string }[] = [
+  { id: 'data',       label: 'Data Centre',   emoji: '🗄️' },
+  { id: 'icp',        label: 'ICP Profile',   emoji: '🎯' },
+  { id: 'profit',     label: 'Profit Matrix', emoji: '📊' },
+  { id: 'recover',    label: 'Recover',       emoji: '🔄' },
+  { id: 'generate',   label: 'Generate',      emoji: '⚡' },
+  { id: 'accelerate', label: 'Ignite',        emoji: '🔥' },
+]
+
 function DashboardInner() {
   const [activeTab, setActiveTab] = useState<Tab>('data')
-  const tabs = [
-    { id: 'data'        as Tab, label: 'Data Centre',  icon: Database   },
-    { id: 'icp'         as Tab, label: 'ICP Profile',  icon: Target     },
-    { id: 'profit'      as Tab, label: 'Profit Matrix', icon: BarChart2  },
-    { id: 'recover'     as Tab, label: 'Recover',      icon: RefreshCw  },
-    { id: 'generate'    as Tab, label: 'Generate',     icon: Zap        },
-    { id: 'accelerate'  as Tab, label: 'Ignite',       icon: TrendingUp },
-  ]
 
   return (
     <div className="min-h-screen bg-[#0F172A] text-white">
@@ -42,19 +42,22 @@ function DashboardInner() {
 
       {/* Tab bar */}
       <div className="max-w-6xl mx-auto px-6">
-        <div className="flex gap-1 border-b border-slate-800">
+        <div className="flex border-b border-slate-800">
           {tabs.map(tab => {
-            const Icon = tab.icon
             const active = activeTab === tab.id
             return (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-4 text-sm font-medium border-b-2 transition-colors -mb-px whitespace-nowrap ${
-                  active ? 'border-teal-500 text-teal-400' : 'border-transparent text-slate-500 hover:text-slate-300'
-                }`}>
-                <Icon size={15} />{tab.label}
-                {tab.id === 'profit' && (
-                  <span className="text-xs bg-teal-500/20 text-teal-400 border border-teal-500/30 px-1.5 py-0.5 rounded-full leading-none">Pro</span>
-                )}
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                style={{ flex: '1 1 0' }}
+                className={`flex items-center justify-center gap-2 py-4 text-sm font-medium border-b-2 transition-colors -mb-px whitespace-nowrap ${
+                  active
+                    ? 'border-teal-500 text-white'
+                    : 'border-transparent text-slate-500 hover:text-white'
+                }`}
+              >
+                <span className="text-base leading-none">{tab.emoji}</span>
+                {tab.label}
               </button>
             )
           })}
