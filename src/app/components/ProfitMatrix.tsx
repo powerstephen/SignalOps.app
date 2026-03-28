@@ -285,112 +285,124 @@ export default function ProfitMatrix() {
   // ── LOCKED ───────────────────────────────────────────────────────────────
   if (!unlocked) {
     return (
-      <div className="space-y-5">
+      <div className="space-y-3">
         {/* Header */}
         <div>
-          <h2 className="text-lg font-bold text-white mb-1">Profit Matrix</h2>
+          <h2 className="text-lg font-bold text-white mb-0.5">Profit Matrix</h2>
           <p className="text-slate-400 text-sm">Your revenue has a leak. Here's exactly where — and what to do about it.</p>
         </div>
 
-        {/* Hero numbers */}
+        {/* ROW 1: Hero numbers (left) + Donut chart (right) */}
         <div className="grid grid-cols-2 gap-3">
-          <div
-            className="border border-red-500/25 rounded-2xl p-5 relative overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, rgba(239,68,68,0.08) 0%, rgba(15,23,42,0.6) 100%)' }}
-          >
-            <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(circle at 0% 0%, rgba(239,68,68,0.12) 0%, transparent 60%)' }}/>
-            <p className="text-xs text-slate-500 mb-1 relative">Revenue at risk</p>
-            <p className="text-4xl font-black text-red-400 relative" style={{ textShadow: '0 0 30px rgba(239,68,68,0.5)' }}>€405k</p>
-            <p className="text-xs text-slate-500 mt-1 relative">from 45 drain accounts</p>
+          {/* Left: stacked stat cards */}
+          <div className="flex flex-col gap-3">
+            <div
+              className="border border-red-500/25 rounded-xl px-4 py-3 relative overflow-hidden flex-1"
+              style={{ background: 'linear-gradient(135deg, rgba(239,68,68,0.08) 0%, rgba(15,23,42,0.6) 100%)' }}
+            >
+              <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(circle at 0% 0%, rgba(239,68,68,0.12) 0%, transparent 60%)' }}/>
+              <p className="text-xs text-slate-500 mb-0.5 relative">Revenue at risk</p>
+              <p className="text-3xl font-black text-red-400 relative leading-tight" style={{ textShadow: '0 0 24px rgba(239,68,68,0.5)' }}>€405k</p>
+              <p className="text-xs text-slate-500 mt-0.5 relative">from 45 drain accounts</p>
+            </div>
+            <div
+              className="border border-teal-500/25 rounded-xl px-4 py-3 relative overflow-hidden flex-1"
+              style={{ background: 'linear-gradient(135deg, rgba(20,184,166,0.08) 0%, rgba(15,23,42,0.6) 100%)' }}
+            >
+              <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(circle at 100% 0%, rgba(20,184,166,0.12) 0%, transparent 60%)' }}/>
+              <p className="text-xs text-slate-500 mb-0.5 relative">Recoverable value</p>
+              <p className="text-3xl font-black text-teal-400 relative leading-tight" style={{ textShadow: '0 0 24px rgba(20,184,166,0.5)' }}>€457k</p>
+              <p className="text-xs text-slate-500 mt-0.5 relative">identified & actionable</p>
+            </div>
+            <div
+              className="border border-slate-700/50 rounded-xl px-4 py-3 relative overflow-hidden flex-1"
+              style={{ background: 'rgba(15,23,42,0.5)' }}
+            >
+              <p className="text-xs text-slate-500 mb-0.5">Champion revenue</p>
+              <p className="text-3xl font-black text-amber-400 leading-tight" style={{ textShadow: '0 0 24px rgba(245,158,11,0.4)' }}>71%</p>
+              <p className="text-xs text-slate-500 mt-0.5">from just 14 accounts</p>
+            </div>
           </div>
-          <div
-            className="border border-teal-500/25 rounded-2xl p-5 relative overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, rgba(20,184,166,0.08) 0%, rgba(15,23,42,0.6) 100%)' }}
-          >
-            <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(circle at 100% 0%, rgba(20,184,166,0.12) 0%, transparent 60%)' }}/>
-            <p className="text-xs text-slate-500 mb-1 relative">Recoverable value</p>
-            <p className="text-4xl font-black text-teal-400 relative" style={{ textShadow: '0 0 30px rgba(20,184,166,0.5)' }}>€457k</p>
-            <p className="text-xs text-slate-500 mt-1 relative">identified & actionable</p>
-          </div>
-        </div>
 
-        {/* Donut chart teaser */}
-        <div
-          className="border border-slate-700/60 rounded-2xl p-5 relative overflow-hidden"
-          style={{ background: 'rgba(15,23,42,0.5)' }}
-        >
-          <p className="text-xs text-slate-500 font-semibold mb-4 uppercase tracking-wider">Your 100 accounts, by profitability</p>
-          <DonutChart animate={chartAnimate} />
-          <div className="mt-4 pt-4 border-t border-slate-700/50">
-            <p className="text-xs text-slate-500">
-              <span className="text-red-400 font-semibold">45 drain accounts</span> are costing more than they generate. 
-              <span className="text-teal-400 font-semibold"> 14 Champions</span> produce 71% of your revenue. Unlock to see exactly what to do.
+          {/* Right: donut chart */}
+          <div
+            className="border border-slate-700/60 rounded-xl p-4 relative overflow-hidden flex flex-col justify-between"
+            style={{ background: 'rgba(15,23,42,0.5)' }}
+          >
+            <p className="text-xs text-slate-500 font-semibold mb-2 uppercase tracking-wider">100 accounts by profitability</p>
+            <DonutChart animate={chartAnimate} />
+            <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+              <span className="text-red-400 font-medium">45 drains</span> cost more than they generate. <span className="text-teal-400 font-medium">14 Champions</span> drive the majority of revenue.
             </p>
           </div>
         </div>
 
-        {/* Unlock card */}
+        {/* ROW 2: Unlock CTA (left) + Feature bullets (right) */}
         <div
-          className="rounded-2xl p-6 relative overflow-hidden"
+          className="rounded-2xl relative overflow-hidden"
           style={{
-            background: 'linear-gradient(135deg, rgba(20,184,166,0.06) 0%, rgba(15,23,42,0.8) 50%, rgba(20,184,166,0.04) 100%)',
+            background: 'linear-gradient(135deg, rgba(20,184,166,0.06) 0%, rgba(15,23,42,0.9) 100%)',
             border: '1px solid',
-            borderColor: pulseGlow ? 'rgba(20,184,166,0.35)' : 'rgba(20,184,166,0.15)',
-            boxShadow: pulseGlow ? '0 0 40px rgba(20,184,166,0.08), inset 0 0 40px rgba(20,184,166,0.03)' : 'none',
+            borderColor: pulseGlow ? 'rgba(20,184,166,0.35)' : 'rgba(20,184,166,0.18)',
+            boxShadow: pulseGlow ? '0 0 36px rgba(20,184,166,0.07)' : 'none',
             transition: 'all 1.5s ease-in-out',
           }}
         >
-          {/* Ambient glow */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(20,184,166,0.6), transparent)' }}/>
-          
-          <div className="text-center mb-5">
-            <div
-              className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 relative"
-              style={{
-                background: 'rgba(20,184,166,0.1)',
-                border: '1px solid rgba(20,184,166,0.3)',
-                boxShadow: '0 0 20px rgba(20,184,166,0.2)',
-              }}
-            >
-              <Lock size={22} className="text-teal-400"/>
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2">Unlock Profit Matrix</h3>
-            <p className="text-slate-400 text-sm max-w-sm mx-auto leading-relaxed">
-              See the specific accounts that are draining your margin, which customers are one fix away from Champion status, and the step-by-step actions ranked by revenue impact.
-            </p>
-          </div>
+          <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(20,184,166,0.5), transparent)' }}/>
 
-          {/* Value items */}
-          <div className="space-y-2 mb-5">
-            {[
-              { icon: BarChart2, text: 'Full profitability breakdown across all 4 customer segments', color: 'text-teal-400' },
-              { icon: AlertTriangle, text: '5 revenue leaks identified — each with a named owner and fix', color: 'text-red-400' },
-              { icon: Target, text: '4 high-value interventions with step-by-step action plans', color: 'text-amber-400' },
-              { icon: Shield, text: 'Champion health monitoring with early warning signals', color: 'text-blue-400' },
-            ].map(({ icon: Icon, text, color }) => (
-              <div key={text} className="flex items-start gap-3 bg-slate-900/40 rounded-xl px-3 py-2.5">
-                <Icon size={13} className={`${color} flex-shrink-0 mt-0.5`}/>
-                <p className="text-xs text-slate-300">{text}</p>
+          <div className="grid grid-cols-2 gap-0">
+            {/* Left: CTA */}
+            <div className="p-5 flex flex-col justify-between border-r border-slate-700/40">
+              <div>
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center mb-3"
+                  style={{ background: 'rgba(20,184,166,0.1)', border: '1px solid rgba(20,184,166,0.3)', boxShadow: '0 0 16px rgba(20,184,166,0.15)' }}
+                >
+                  <Lock size={18} className="text-teal-400"/>
+                </div>
+                <h3 className="text-base font-bold text-white mb-1.5">Unlock Profit Matrix</h3>
+                <p className="text-xs text-slate-400 leading-relaxed mb-3">
+                  See exactly which accounts are draining your margin, who's one fix away from Champion status, and the actions ranked by revenue impact.
+                </p>
+                <p className="text-xs text-teal-400 font-semibold mb-3">Growth plan · €99/month</p>
               </div>
-            ))}
-          </div>
+              <button
+                onClick={() => setUnlocked(true)}
+                className="w-full py-3 rounded-xl font-bold text-sm text-white transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                style={{
+                  background: 'linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #0d9488 100%)',
+                  boxShadow: '0 4px 20px rgba(20,184,166,0.35), 0 1px 0 rgba(255,255,255,0.1) inset',
+                }}
+              >
+                <span className="flex items-center justify-center gap-2">
+                  <Sparkles size={13}/>
+                  Unlock Profit Matrix
+                  <ArrowRight size={13}/>
+                </span>
+              </button>
+              <p className="text-center text-xs text-slate-600 mt-1.5">Demo mode — click to preview</p>
+            </div>
 
-          <p className="text-center text-xs text-teal-400 font-semibold mb-3">Available on Growth plan · €99/month</p>
-          <button
-            onClick={() => setUnlocked(true)}
-            className="w-full py-3.5 rounded-xl font-bold text-sm text-white relative overflow-hidden transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]"
-            style={{
-              background: 'linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #0d9488 100%)',
-              boxShadow: '0 4px 24px rgba(20,184,166,0.35), 0 1px 0 rgba(255,255,255,0.1) inset',
-            }}
-          >
-            <span className="relative z-10 flex items-center justify-center gap-2">
-              <Sparkles size={14}/>
-              Unlock Profit Matrix
-              <ArrowRight size={14}/>
-            </span>
-          </button>
-          <p className="text-center text-xs text-slate-600 mt-2">Demo mode — click to preview</p>
+            {/* Right: feature list */}
+            <div className="p-5 flex flex-col justify-center space-y-2.5">
+              {[
+                { icon: BarChart2, text: 'Full profitability breakdown across all 4 segments', color: 'text-teal-400', bg: 'rgba(20,184,166,0.1)', border: 'rgba(20,184,166,0.25)' },
+                { icon: AlertTriangle, text: '5 revenue leaks — each with a named owner and fix', color: 'text-red-400', bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.25)' },
+                { icon: Target, text: '4 interventions with step-by-step action plans', color: 'text-amber-400', bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.25)' },
+                { icon: Shield, text: 'Champion health monitoring & early warnings', color: 'text-blue-400', bg: 'rgba(59,130,246,0.1)', border: 'rgba(59,130,246,0.25)' },
+              ].map(({ icon: Icon, text, color, bg, border }) => (
+                <div key={text} className="flex items-start gap-2.5">
+                  <div
+                    className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                    style={{ background: bg, border: `1px solid ${border}` }}
+                  >
+                    <Icon size={11} className={color}/>
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed">{text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     )
