@@ -288,7 +288,7 @@ export default function ProfitMatrix() {
       <div className="space-y-3">
         {/* Header */}
         <div>
-          <h2 className="text-lg font-bold text-white mb-0.5">Profit Matrix</h2>
+          <h2 className="text-lg font-bold text-white mb-0.5">Profit Matrix Snapshot</h2>
           <p className="text-slate-400 text-sm">Your revenue has a leak. Here's exactly where — and what to do about it.</p>
         </div>
 
@@ -409,7 +409,7 @@ export default function ProfitMatrix() {
       <div className="flex items-start justify-between mb-5">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <h2 className="text-lg font-bold text-white">Profit Matrix</h2>
+            <h2 className="text-lg font-bold text-white">Profit Matrix Snapshot</h2>
             <span
               className="text-xs text-white px-2 py-0.5 rounded-full font-semibold"
               style={{ background: 'linear-gradient(135deg, #0d9488, #14b8a6)', boxShadow: '0 0 10px rgba(20,184,166,0.3)' }}
