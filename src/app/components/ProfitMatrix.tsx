@@ -294,61 +294,43 @@ export default function ProfitMatrix() {
 
         {/* ROW 1: Hero numbers (left) + Donut chart (right) */}
         <div className="grid grid-cols-2 gap-3">
-          {/* Left: stacked stat cards */}
-          <div className="flex flex-col gap-3">
-            <div
-              className="border border-red-500/25 rounded-xl px-4 py-3 relative overflow-hidden flex-1"
-              style={{ background: 'linear-gradient(135deg, rgba(239,68,68,0.08) 0%, rgba(15,23,42,0.6) 100%)' }}
-            >
-              <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(circle at 0% 0%, rgba(239,68,68,0.12) 0%, transparent 60%)' }}/>
-              <p className="text-xs text-slate-500 mb-0.5 relative">Revenue at risk</p>
-              <p className="text-3xl font-black text-red-400 relative leading-tight" style={{ textShadow: '0 0 24px rgba(239,68,68,0.5)' }}>€405k</p>
-              <p className="text-xs text-slate-500 mt-0.5 relative">from 45 drain accounts</p>
-            </div>
-            <div
-              className="border border-teal-500/25 rounded-xl px-4 py-3 relative overflow-hidden flex-1"
-              style={{ background: 'linear-gradient(135deg, rgba(20,184,166,0.08) 0%, rgba(15,23,42,0.6) 100%)' }}
-            >
-              <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(circle at 100% 0%, rgba(20,184,166,0.12) 0%, transparent 60%)' }}/>
-              <p className="text-xs text-slate-500 mb-0.5 relative">Recoverable value</p>
-              <p className="text-3xl font-black text-teal-400 relative leading-tight" style={{ textShadow: '0 0 24px rgba(20,184,166,0.5)' }}>€457k</p>
-              <p className="text-xs text-slate-500 mt-0.5 relative">identified & actionable</p>
-            </div>
-            <div
-              className="border border-slate-700/50 rounded-xl px-4 py-3 relative overflow-hidden flex-1"
-              style={{ background: 'rgba(15,23,42,0.5)' }}
-            >
-              <p className="text-xs text-slate-500 mb-0.5">Champion revenue</p>
-              <p className="text-3xl font-black text-amber-400 leading-tight" style={{ textShadow: '0 0 24px rgba(245,158,11,0.4)' }}>71%</p>
-              <p className="text-xs text-slate-500 mt-0.5">from just 14 accounts</p>
-            </div>
+          {/* Left: 3 stat rows in a single bordered card */}
+          <div className="border border-slate-700/50 rounded-xl overflow-hidden" style={{ background: 'rgba(15,23,42,0.5)' }}>
+            {[
+              { label: 'Revenue at risk', value: '€405k', sub: 'from 45 drain accounts', color: '#f87171' },
+              { label: 'Recoverable value', value: '€457k', sub: 'identified & actionable', color: '#2dd4bf' },
+              { label: 'Champion revenue', value: '71%', sub: 'from just 14 accounts', color: '#fbbf24' },
+            ].map((s, i, arr) => (
+              <div
+                key={s.label}
+                className={`flex items-center justify-between px-4 py-2.5 ${i < arr.length - 1 ? 'border-b border-slate-700/40' : ''}`}
+              >
+                <div>
+                  <p className="text-xs text-slate-500">{s.label}</p>
+                  <p className="text-xs text-slate-600">{s.sub}</p>
+                </div>
+                <p className="text-2xl font-black" style={{ color: s.color }}>{s.value}</p>
+              </div>
+            ))}
           </div>
 
           {/* Right: donut chart */}
           <div
-            className="border border-slate-700/60 rounded-xl p-4 relative overflow-hidden flex flex-col justify-between"
+            className="border border-slate-700/50 rounded-xl p-4 flex flex-col"
             style={{ background: 'rgba(15,23,42,0.5)' }}
           >
-            <p className="text-xs text-slate-500 font-semibold mb-2 uppercase tracking-wider">100 accounts by profitability</p>
-            <DonutChart animate={chartAnimate} />
-            <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-              <span className="text-red-400 font-medium">45 drains</span> cost more than they generate. <span className="text-teal-400 font-medium">14 Champions</span> drive the majority of revenue.
-            </p>
+            <p className="text-xs text-slate-500 font-medium mb-2 uppercase tracking-wider">100 accounts by profitability</p>
+            <div className="flex-1 flex items-center">
+              <DonutChart animate={chartAnimate} />
+            </div>
           </div>
         </div>
 
         {/* ROW 2: Unlock CTA (left) + Feature bullets (right) */}
         <div
-          className="rounded-2xl relative overflow-hidden"
-          style={{
-            background: 'linear-gradient(135deg, rgba(20,184,166,0.06) 0%, rgba(15,23,42,0.9) 100%)',
-            border: '1px solid',
-            borderColor: pulseGlow ? 'rgba(20,184,166,0.35)' : 'rgba(20,184,166,0.18)',
-            boxShadow: pulseGlow ? '0 0 36px rgba(20,184,166,0.07)' : 'none',
-            transition: 'all 1.5s ease-in-out',
-          }}
+          className="rounded-xl overflow-hidden border border-slate-700/50"
+          style={{ background: 'rgba(15,23,42,0.5)' }}
         >
-          <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(20,184,166,0.5), transparent)' }}/>
 
           <div className="grid grid-cols-2 gap-0">
             {/* Left: CTA */}
