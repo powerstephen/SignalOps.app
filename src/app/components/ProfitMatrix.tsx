@@ -112,8 +112,8 @@ function DonutChart({ animate }: { animate: boolean }) {
   })
 
   return (
-    <div className="flex items-center gap-6">
-      <svg width="160" height="160" viewBox="0 0 160 160">
+    <div className="flex items-center justify-center gap-8 w-full">
+      <svg width="140" height="140" viewBox="0 0 160 160">
         <defs>
           {arcs.map(a => (
             <filter key={a.label} id={`glow-${a.label}`}>
@@ -143,12 +143,12 @@ function DonutChart({ animate }: { animate: boolean }) {
         <text x={cx} y={cy - 6} textAnchor="middle" fill="white" fontSize="18" fontWeight="700">100</text>
         <text x={cx} y={cy + 10} textAnchor="middle" fill="#64748b" fontSize="9">accounts</text>
       </svg>
-      <div className="space-y-2">
+      <div className="space-y-3">
         {arcs.map(a => (
-          <div key={a.label} className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: a.color, boxShadow: `0 0 6px ${a.glow}` }}/>
-            <span className="text-xs text-slate-400">{a.label}</span>
-            <span className="text-xs font-bold ml-auto pl-4" style={{ color: a.color }}>{a.count}</span>
+          <div key={a.label} className="flex items-center gap-2.5">
+            <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: a.color }}/>
+            <span className="text-xs text-slate-400 w-20">{a.label}</span>
+            <span className="text-sm font-bold ml-1" style={{ color: a.color }}>{a.count}</span>
           </div>
         ))}
       </div>
@@ -296,6 +296,9 @@ export default function ProfitMatrix() {
         <div className="grid grid-cols-2 gap-3">
           {/* Left: 3 stat rows in a single bordered card */}
           <div className="border border-slate-700/50 rounded-xl overflow-hidden" style={{ background: 'rgba(15,23,42,0.5)' }}>
+            <div className="px-4 py-2.5 border-b border-slate-700/40">
+              <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Key metrics</p>
+            </div>
             {[
               { label: 'Revenue at risk', value: '€405k', sub: 'from 45 drain accounts', color: '#f87171' },
               { label: 'Recoverable value', value: '€457k', sub: 'identified & actionable', color: '#2dd4bf' },
@@ -303,10 +306,10 @@ export default function ProfitMatrix() {
             ].map((s, i, arr) => (
               <div
                 key={s.label}
-                className={`flex items-center justify-between px-4 py-2.5 ${i < arr.length - 1 ? 'border-b border-slate-700/40' : ''}`}
+                className={`flex items-center justify-between px-4 py-3 ${i < arr.length - 1 ? 'border-b border-slate-700/40' : ''}`}
               >
                 <div>
-                  <p className="text-xs text-slate-500">{s.label}</p>
+                  <p className="text-xs text-slate-400">{s.label}</p>
                   <p className="text-xs text-slate-600">{s.sub}</p>
                 </div>
                 <p className="text-2xl font-black" style={{ color: s.color }}>{s.value}</p>
@@ -319,8 +322,8 @@ export default function ProfitMatrix() {
             className="border border-slate-700/50 rounded-xl p-4 flex flex-col"
             style={{ background: 'rgba(15,23,42,0.5)' }}
           >
-            <p className="text-xs text-slate-500 font-medium mb-2 uppercase tracking-wider">100 accounts by profitability</p>
-            <div className="flex-1 flex items-center">
+            <p className="text-xs text-slate-500 font-medium mb-3 uppercase tracking-wider">100 accounts by profitability</p>
+            <div className="flex-1 flex items-center justify-center">
               <DonutChart animate={chartAnimate} />
             </div>
           </div>
