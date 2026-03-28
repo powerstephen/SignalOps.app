@@ -338,7 +338,7 @@ export default function ProfitMatrix() {
             {/* Left: what's inside */}
             <div className="p-5">
               <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-3">What you'll unlock</p>
-              <div className="space-y-2.5">
+              <div className="space-y-2.5 mt-4 pl-3">
                 {[
                   { icon: BarChart2, text: 'Full profitability breakdown across all 4 segments', color: 'text-teal-400', bg: 'rgba(20,184,166,0.1)', border: 'rgba(20,184,166,0.2)' },
                   { icon: AlertTriangle, text: '5 revenue leaks — each with a named owner and fix', color: 'text-red-400', bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.2)' },
