@@ -6,9 +6,10 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const code = searchParams.get('code')
   const accountId = searchParams.get('state')
+  const baseUrl = new URL(request.url).origin
 
   if (!code || !accountId) {
-    return NextResponse.redirect('/?error=missing_params')
+    return NextResponse.redirect(`${baseUrl}/?error=missing_params`)
   }
 
   try {
@@ -28,7 +29,7 @@ export async function GET(request: Request) {
 
     if (!tokenRes.ok) {
       console.error('HubSpot token error:', tokens)
-      return NextResponse.redirect('/?error=token_exchange_failed')
+      return NextResponse.redirect(`${baseUrl}/?error=token_exchange_failed`)
     }
 
     const expiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString()
@@ -40,9 +41,9 @@ export async function GET(request: Request) {
       expires_at: expiresAt,
     })
 
-    return NextResponse.redirect('/?connected=true')
+    return NextResponse.redirect(`${baseUrl}/?connected=true`)
   } catch (err) {
     console.error('OAuth callback error:', err)
-    return NextResponse.redirect('/?error=server_error')
+    return NextResponse.redirect(`${baseUrl}/?error=server_error`)
   }
 }
