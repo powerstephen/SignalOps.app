@@ -86,9 +86,12 @@ export default function DataCentre() {
     integrations.filter(i => i.category === c.id).some(i => isConn(i.id)) ||
     sources.some(s => s.id === `csv-${c.id}`)
   ).length
-
-  function handleConnect(ig: Integration) {
+function handleConnect(ig: Integration) {
     if (!ig.datasets) return
+    if (ig.id === 'hubspot') {
+      window.location.href = '/api/auth/hubspot?account_id=demo-account'
+      return
+    }
     setImporting(ig)
   }
   function handleDisconnect(ig: Integration) {
