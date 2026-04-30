@@ -1,6 +1,6 @@
 'use client'
-import { useState, useRef } from 'react'
-import { CheckCircle, Plus, ExternalLink, Upload, ChevronRight } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { CheckCircle, Plus, ExternalLink, Upload, ChevronRight, RefreshCw } from 'lucide-react'
 import { useImport } from '../context/ImportContext'
 import ImportModal from './ImportModal'
 
@@ -27,14 +27,13 @@ const integrations: Integration[] = [
   { id:'chargebee',  name:'Chargebee',  fallback:'CB', logo:'/chargebee.png',  category:'billing',  description:'Import subscription billing data to power your best-customer ICP profile.', datasets:[{label:'Subscription Data',records:20,fields:['company','mrr','arr','plan','seats','renewal_date']}] },
   { id:'paddle',     name:'Paddle',     fallback:'PA', logo:'/paddle.png',     category:'billing',  description:'Sync Paddle billing events and revenue data for LTV analysis.', comingSoon:true },
   { id:'intercom',   name:'Intercom',   fallback:'IC', logo:'/intercom.png',   category:'cs',       description:'Pull support ticket volume, type, and sentiment to identify high-maintenance accounts.', datasets:[{label:'CS Tickets',records:20,fields:['company','tickets','ticket_type','sentiment','response_time','health_trend']}] },
-  { id:'zendesk',    name:'Zendesk',    fallback:'ZD', logo:'/zendesk.png', category:'cs',       description:'Import CS ticket history to surface which customers are truly profitable.', datasets:[{label:'Support History',records:20,fields:['company','open_tickets','sentiment','risk_flags','csm']}] },
+  { id:'zendesk',    name:'Zendesk',    fallback:'ZD', logo:'/zendesk.png',    category:'cs',       description:'Import CS ticket history to surface which customers are truly profitable.', datasets:[{label:'Support History',records:20,fields:['company','open_tickets','sentiment','risk_flags','csm']}] },
   { id:'freshdesk',  name:'Freshdesk',  fallback:'FD', logo:'/freshdesk.png',  category:'cs',       description:'Connect Freshdesk to analyse support cost per customer.', comingSoon:true },
-  { id:'gmail',     name:'Gmail',     fallback:'GM', logo:'https://cdn.worldvectorlogo.com/logos/gmail-icon-2.svg', category:'outreach', description:'Connect Gmail to send generated emails directly from SignalOps with one click.', datasets:[{label:'Gmail Connected',records:0,fields:['from','to','subject','body']}] },
-  { id:'outlook',   name:'Outlook',   fallback:'OL', logo:'/outlook.png', category:'outreach', description:'Connect Outlook to send reengagement and prospect emails directly from your inbox.', datasets:[{label:'Outlook Connected',records:0,fields:['from','to','subject','body']}] },
-
-  { id:'outreach',  name:'Outreach',  fallback:'OR', logo:'/outreach.png',   category:'outreach', description:'Push scored accounts and emails directly to Outreach sequences.', comingSoon:true },
-  { id:'salesloft', name:'Salesloft', fallback:'SL', logo:'https://cdn.worldvectorlogo.com/logos/salesloft.svg', category:'outreach', description:'Send high-scoring accounts straight to Salesloft for sequencing.', comingSoon:true },
-  { id:'apollo',    name:'Apollo',    fallback:'AP', logo:'/apollo.png',     category:'outreach', description:'Export lookalike prospects to Apollo outreach campaigns.', comingSoon:true },
+  { id:'gmail',      name:'Gmail',      fallback:'GM', logo:'https://cdn.worldvectorlogo.com/logos/gmail-icon-2.svg', category:'outreach', description:'Connect Gmail to send generated emails directly from SignalOps with one click.', datasets:[{label:'Gmail Connected',records:0,fields:['from','to','subject','body']}] },
+  { id:'outlook',    name:'Outlook',    fallback:'OL', logo:'/outlook.png',    category:'outreach', description:'Connect Outlook to send reengagement and prospect emails directly from your inbox.', datasets:[{label:'Outlook Connected',records:0,fields:['from','to','subject','body']}] },
+  { id:'outreach',   name:'Outreach',   fallback:'OR', logo:'/outreach.png',   category:'outreach', description:'Push scored accounts and emails directly to Outreach sequences.', comingSoon:true },
+  { id:'salesloft',  name:'Salesloft',  fallback:'SL', logo:'https://cdn.worldvectorlogo.com/logos/salesloft.svg', category:'outreach', description:'Send high-scoring accounts straight to Salesloft for sequencing.', comingSoon:true },
+  { id:'apollo',     name:'Apollo',     fallback:'AP', logo:'/apollo.png',     category:'outreach', description:'Export lookalike prospects to Apollo outreach campaigns.', comingSoon:true },
   { id:'linkedin',   name:'LinkedIn',   fallback:'LI', logo:'https://cdn.worldvectorlogo.com/logos/linkedin-icon-2.svg', category:'signals', description:'Monitor job changes, hiring signals, and company updates.', comingSoon:true },
   { id:'harmonic',   name:'Harmonic',   fallback:'HM', logo:'/harmonic.png',   category:'signals',  description:'Pull funding, headcount, and hiring signal data via Harmonic API.', comingSoon:true },
   { id:'bombora',    name:'Bombora',    fallback:'BO', logo:'/bombora.png',    category:'signals',  description:'Layer intent signal data to identify in-market accounts.', comingSoon:true },
@@ -49,20 +48,9 @@ const catLabels: Record<string, string> = { crm:'CRM', billing:'Billing', cs:'CS
 function IntegrationLogo({ logo, fallback, name }: { logo: string; fallback: string; name: string }) {
   const [error, setError] = useState(false)
   if (!logo || error) {
-    return (
-      <span className="text-xs font-bold text-slate-500 tracking-wide">
-        {fallback}
-      </span>
-    )
+    return <span className="text-xs font-bold text-slate-500 tracking-wide">{fallback}</span>
   }
-  return (
-    <img
-      src={logo}
-      alt={name}
-      className="w-8 h-8 object-contain"
-      onError={() => setError(true)}
-    />
-  )
+  return <img src={logo} alt={name} className="w-8 h-8 object-contain" onError={() => setError(true)} />
 }
 
 export default function DataCentre() {
@@ -70,23 +58,58 @@ export default function DataCentre() {
   const [activeCat, setActiveCat] = useState('crm')
   const [importing, setImporting] = useState<Integration | null>(null)
   const [uploadingCsv, setUploadingCsv] = useState(false)
+  const [hubspotConnected, setHubspotConnected] = useState(false)
+  const [hubspotCounts, setHubspotCounts] = useState({ contacts: 0, companies: 0, deals: 0 })
+  const [syncing, setSyncing] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    fetch('/api/hubspot/status?account_id=demo-account')
+      .then(r => r.json())
+      .then(d => {
+        if (d.connected) {
+          setHubspotConnected(true)
+          setHubspotCounts(d.counts || { contacts: 0, companies: 0, deals: 0 })
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  async function handleSync() {
+    setSyncing(true)
+    try {
+      const res = await fetch('/api/hubspot/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accountId: 'demo-account' }),
+      })
+      const data = await res.json()
+      if (data.synced) {
+        setHubspotCounts({ contacts: data.synced.contacts, companies: data.synced.companies, deals: data.synced.deals })
+      }
+    } catch {}
+    setSyncing(false)
+  }
 
   const cat = categories.find(c => c.id === activeCat)!
   const visibleIntegrations = integrations.filter(i => i.category === activeCat)
 
-  const isConn = (id: string) =>
-    integrations.find(i => i.id === id)?.datasets?.some(ds =>
+  const isConn = (id: string) => {
+    if (id === 'hubspot') return hubspotConnected
+    return integrations.find(i => i.id === id)?.datasets?.some(ds =>
       sources.some(s => s.id === `${id}-${ds.label.toLowerCase().replace(/\s/g, '-')}`)
     ) ?? false
+  }
 
   const csvConnected = sources.some(s => s.id === `csv-${activeCat}`)
   const connectedInCat = visibleIntegrations.some(i => isConn(i.id)) || csvConnected
-  const totalConnected = categories.filter(c =>
-    integrations.filter(i => i.category === c.id).some(i => isConn(i.id)) ||
-    sources.some(s => s.id === `csv-${c.id}`)
-  ).length
-function handleConnect(ig: Integration) {
+  const totalConnected = categories.filter(c => {
+    if (c.id === 'crm') return hubspotConnected || sources.some(s => s.id === `csv-crm`)
+    return integrations.filter(i => i.category === c.id).some(i => isConn(i.id)) ||
+      sources.some(s => s.id === `csv-${c.id}`)
+  }).length
+
+  function handleConnect(ig: Integration) {
     if (!ig.datasets) return
     if (ig.id === 'hubspot') {
       window.location.href = '/api/auth/hubspot?account_id=demo-account'
@@ -94,9 +117,15 @@ function handleConnect(ig: Integration) {
     }
     setImporting(ig)
   }
+
   function handleDisconnect(ig: Integration) {
+    if (ig.id === 'hubspot') {
+      setHubspotConnected(false)
+      return
+    }
     ig.datasets?.forEach(ds => removeSource(`${ig.id}-${ds.label.toLowerCase().replace(/\s/g, '-')}`))
   }
+
   function handleCsvUpload(file: File) {
     if (!file || !cat.csvFields.length) return
     setUploadingCsv(true)
@@ -112,14 +141,41 @@ function handleConnect(ig: Integration) {
         <ImportModal source={{ id:importing.id, name:importing.name, icon:importing.fallback, datasets:importing.datasets }} onClose={() => setImporting(null)} onComplete={() => setImporting(null)} />
       )}
 
-      <div className="mb-5">
+      <div className="mb-5 flex items-center justify-between">
         <p className="text-slate-400 text-sm">
           Connect one source per category.{' '}
           {totalConnected > 0
             ? <span className="text-teal-400 font-medium">{totalConnected} of {categories.length} categories connected.</span>
             : <span className="text-slate-500">No sources connected yet.</span>}
         </p>
+        {hubspotConnected && (
+          <button onClick={handleSync} disabled={syncing}
+            className="flex items-center gap-1.5 text-xs font-medium text-teal-400 border border-teal-500/30 px-3 py-1.5 rounded-lg hover:bg-teal-500/10 transition-colors disabled:opacity-50">
+            <RefreshCw size={12} className={syncing ? 'animate-spin' : ''} />
+            {syncing ? 'Syncing...' : 'Sync HubSpot'}
+          </button>
+        )}
       </div>
+
+      {hubspotConnected && (
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          <div className="bg-teal-500/5 border border-teal-500/20 rounded-lg p-3">
+            <p className="text-xs text-teal-400 font-semibold mb-0.5">HubSpot Contacts</p>
+            <p className="text-xl font-bold text-white">{hubspotCounts.contacts.toLocaleString()}</p>
+            <p className="text-xs text-slate-500">records synced</p>
+          </div>
+          <div className="bg-teal-500/5 border border-teal-500/20 rounded-lg p-3">
+            <p className="text-xs text-teal-400 font-semibold mb-0.5">HubSpot Companies</p>
+            <p className="text-xl font-bold text-white">{hubspotCounts.companies.toLocaleString()}</p>
+            <p className="text-xs text-slate-500">records synced</p>
+          </div>
+          <div className="bg-teal-500/5 border border-teal-500/20 rounded-lg p-3">
+            <p className="text-xs text-teal-400 font-semibold mb-0.5">HubSpot Deals</p>
+            <p className="text-xl font-bold text-white">{hubspotCounts.deals.toLocaleString()}</p>
+            <p className="text-xs text-slate-500">records synced</p>
+          </div>
+        </div>
+      )}
 
       {sources.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
@@ -134,11 +190,12 @@ function handleConnect(ig: Integration) {
       )}
 
       <div className="flex gap-6">
-        {/* Left nav */}
         <div className="w-40 flex-shrink-0">
           <div className="space-y-1">
             {categories.map(c => {
-              const connected = integrations.filter(i => i.category === c.id).some(i => isConn(i.id)) || sources.some(s => s.id === `csv-${c.id}`)
+              const connected = c.id === 'crm'
+                ? hubspotConnected || sources.some(s => s.id === `csv-crm`)
+                : integrations.filter(i => i.category === c.id).some(i => isConn(i.id)) || sources.some(s => s.id === `csv-${c.id}`)
               const active = activeCat === c.id
               return (
                 <button key={c.id} onClick={() => setActiveCat(c.id)}
@@ -151,7 +208,6 @@ function handleConnect(ig: Integration) {
           </div>
         </div>
 
-        {/* Right: white cards grid — 4 per row */}
         <div className="flex-1 min-w-0">
           <p className="text-xs text-slate-500 mb-4">{cat.description}</p>
 
@@ -161,10 +217,7 @@ function handleConnect(ig: Integration) {
               const otherConn = connectedInCat && !conn
               return (
                 <div key={ig.id}
-                  className={`bg-white rounded-2xl p-5 flex flex-col shadow-sm transition-all ${
-                    conn ? 'ring-2 ring-teal-500' : 'hover:shadow-md'
-                  }`}>
-                  {/* Top: logo + category pill */}
+                  className={`bg-white rounded-2xl p-5 flex flex-col shadow-sm transition-all ${conn ? 'ring-2 ring-teal-500' : 'hover:shadow-md'}`}>
                   <div className="flex items-start justify-between mb-4">
                     <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center border border-gray-100">
                       <IntegrationLogo logo={ig.logo} fallback={ig.fallback} name={ig.name} />
@@ -175,7 +228,13 @@ function handleConnect(ig: Integration) {
                   </div>
                   <h3 className="font-bold text-gray-900 text-sm mb-1">{ig.name}</h3>
                   <p className="text-gray-500 text-xs leading-relaxed flex-1 mb-4">{ig.description}</p>
-                  {conn && ig.datasets && (
+                  {conn && ig.id === 'hubspot' && (
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      <span className="text-xs bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full border border-teal-100">{hubspotCounts.contacts} contacts</span>
+                      <span className="text-xs bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full border border-teal-100">{hubspotCounts.companies} companies</span>
+                    </div>
+                  )}
+                  {conn && ig.id !== 'hubspot' && ig.datasets && (
                     <div className="flex flex-wrap gap-1 mb-3">
                       {ig.datasets.map(ds => (
                         <span key={ds.label} className="text-xs bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full border border-teal-100">{ds.records} records</span>
@@ -203,7 +262,6 @@ function handleConnect(ig: Integration) {
             })}
           </div>
 
-          {/* CSV upload */}
           {cat.csvFields.length > 0 && (
             <div>
               <div className="flex items-center gap-3 mb-3">
