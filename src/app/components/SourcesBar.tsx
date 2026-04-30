@@ -1,4 +1,5 @@
 'use client'
+import { useEffect, useState } from 'react'
 import { Database, CheckCircle, AlertCircle } from 'lucide-react'
 import { useImport } from '../context/ImportContext'
 
@@ -11,8 +12,24 @@ const typeColors: Record<string, string> = {
 
 export default function SourcesBar() {
   const { sources, totalRecords } = useImport()
+  const [hubspotConnected, setHubspotConnected] = useState(false)
+  const [hubspotCounts, setHubspotCounts] = useState({ contacts: 0, companies: 0 })
 
-  if (sources.length === 0) {
+  useEffect(() => {
+    fetch('/api/hubspot/status?account_id=demo-account')
+      .then(r => r.json())
+      .then(d => {
+        if (d.connected) {
+          setHubspotConnected(true)
+          setHubspotCounts({ contacts: d.counts?.contacts || 0, companies: d.counts?.companies || 0 })
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  const hasAnySources = sources.length > 0 || hubspotConnected
+
+  if (!hasAnySources) {
     return (
       <div className="flex items-center gap-2 bg-amber-500/5 border border-amber-500/20 rounded-lg px-4 py-2.5 mb-6">
         <AlertCircle size={14} className="text-amber-400 flex-shrink-0" />
@@ -23,14 +40,23 @@ export default function SourcesBar() {
     )
   }
 
+  const hubspotRecords = hubspotCounts.contacts + hubspotCounts.companies
+  const total = totalRecords + (hubspotConnected ? hubspotRecords : 0)
+
   return (
     <div className="flex items-center gap-3 bg-teal-500/5 border border-teal-500/20 rounded-lg px-4 py-2.5 mb-6 flex-wrap">
       <div className="flex items-center gap-1.5">
         <Database size={13} className="text-teal-500" />
-        <span className="text-xs font-semibold text-teal-400">{totalRecords.toLocaleString()} records</span>
+        <span className="text-xs font-semibold text-teal-400">{total.toLocaleString()} records</span>
       </div>
       <span className="text-slate-700 text-xs">|</span>
       <div className="flex items-center gap-2 flex-wrap">
+        {hubspotConnected && (
+          <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded font-medium text-blue-400 bg-blue-500/10">
+            <CheckCircle size={10} />
+            HubSpot ({hubspotRecords.toLocaleString()} records)
+          </span>
+        )}
         {sources.map(s => (
           <span key={s.id} className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded font-medium ${typeColors[s.type] ?? 'text-slate-400 bg-slate-700'}`}>
             <CheckCircle size={10} />
