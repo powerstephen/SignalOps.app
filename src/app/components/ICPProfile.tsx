@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Target, TrendingUp, AlertTriangle, CheckCircle, Star, Zap, Users, DollarSign, Award } from 'lucide-react'
 
 const MOCK_RESULT = {
-  summary: "Koreva's best customers are mid-market B2B SaaS companies in HR Tech and Sales Tech, typically Series A to Series B, with 40–90 employees. They reach value fast, expand consistently, and generate 3.4x the LTV of your average customer with 45% fewer support tickets.",
+  summary: "SignalOps's best customers are mid-market B2B SaaS companies in HR Tech and Sales Tech, typically Series A to Series B, with 40–90 employees. They reach value fast, expand consistently, and generate 3.4x the LTV of your average customer with 45% fewer support tickets.",
   revenue_reality: { total_analysed:100, best_customers:24, avg_ltv_best:68400, avg_ltv_all:20200, ltv_multiplier:'3.4x', revenue_concentration:'71%' },
   primary_icp: {
     label:'Primary ICP', color:'teal', title:'Mid-Market HR & Sales Tech',
@@ -122,17 +122,36 @@ function ICPCard({icp}:{icp:typeof MOCK_RESULT.primary_icp}) {
 export default function ICPProfile() {
   const [loading,setLoading]=useState(false)
   const [result,setResult]=useState<typeof MOCK_RESULT|null>(null)
-  const R=MOCK_RESULT
+  const [counts,setCounts]=useState({contacts:0,companies:0})
+  const R=result||MOCK_RESULT
 
-  function handleAnalyse() {
+  useState(()=>{
+    fetch('/api/hubspot/counts?account_id=demo-account')
+      .then(r=>r.json())
+      .then(d=>{ if(d.contacts!==undefined) setCounts(d) })
+      .catch(()=>{})
+  })
+
+  async function handleAnalyse() {
     setLoading(true)
-    setTimeout(()=>{setResult(MOCK_RESULT);setLoading(false)},2800)
+    try {
+      const res = await fetch('/api/analyze-icp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accountId: 'demo-account' }),
+      })
+      const data = await res.json()
+      setResult(data.result || MOCK_RESULT)
+    } catch {
+      setResult(MOCK_RESULT)
+    }
+    setLoading(false)
   }
 
   return (
     <div>
       <div className="grid grid-cols-4 gap-3 mb-6">
-        <StatCard icon={Users} label="Total accounts" value={R.revenue_reality.total_analysed} sub="in your CRM"/>
+        <StatCard icon={Users} label="Total accounts" value={counts.companies||R.revenue_reality.total_analysed} sub="in your CRM"/>
         <StatCard icon={Star} label="Active customers" value="72" sub="currently paying" color="green"/>
         <StatCard icon={AlertTriangle} label="Churned" value="9" sub="lost accounts" color="amber"/>
         <StatCard icon={Zap} label="At risk" value="5" sub="flagged accounts" color="red"/>
@@ -144,7 +163,7 @@ export default function ICPProfile() {
             <Target size={28} className="text-teal-500"/>
           </div>
           <h3 className="text-xl font-bold text-white mb-2">Build your ICP Profile</h3>
-          <p className="text-slate-400 text-sm max-w-lg mx-auto mb-2">SignalOps analyses your {R.revenue_reality.total_analysed} customer records — CRM data, billing outcomes, CS history — to identify the characteristics of your truly best customers.</p>
+          <p className="text-slate-400 text-sm max-w-lg mx-auto mb-2">SignalOps analyses your {counts.companies||R.revenue_reality.total_analysed} customer records — CRM data, billing outcomes, CS history — to identify the characteristics of your truly best customers.</p>
           <p className="text-slate-500 text-xs max-w-md mx-auto mb-6 italic">Not your average customers. Your best ones — the ones that stay, expand, and never drain your team.</p>
           <button onClick={handleAnalyse} disabled={loading}
             className="bg-teal-500 hover:bg-teal-400 disabled:opacity-70 text-white font-semibold px-8 py-3 rounded-xl transition-colors inline-flex items-center gap-2">
@@ -155,7 +174,6 @@ export default function ICPProfile() {
         </div>
       ) : (
         <div className="space-y-6">
-
           <div className="bg-teal-500/10 border border-teal-500/30 rounded-2xl p-5">
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 bg-teal-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"><Target size={16} className="text-white"/></div>
@@ -253,7 +271,6 @@ export default function ICPProfile() {
               <button className="text-xs font-semibold text-teal-400 border border-teal-500/30 px-3 py-1.5 rounded-lg hover:bg-teal-500/10 transition-colors">Export ICP →</button>
             </div>
           </div>
-
         </div>
       )}
     </div>
