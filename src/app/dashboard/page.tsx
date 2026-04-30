@@ -35,7 +35,7 @@ function DashboardInner() {
         </div>
         <div className="flex items-center gap-3">
           <span className="text-xs text-slate-500 border border-slate-700 px-2 py-0.5 rounded">Demo</span>
-          <span className="text-xs text-slate-500">Koreva · B2B SaaS</span>
+          <span className="text-xs text-slate-500">SignalOps · B2B SaaS</span>
           <div className="w-2 h-2 rounded-full bg-teal-500" />
         </div>
       </nav>
