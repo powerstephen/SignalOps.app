@@ -1,0 +1,6 @@
+{
+  "/page": "app/page.js",
+  "/api/hubspot/counts/route": "app/api/hubspot/counts/route.js",
+  "/api/analyze-icp/route": "app/api/analyze-icp/route.js",
+  "/api/hubspot/status/route": "app/api/hubspot/status/route.js"
+}
