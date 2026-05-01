@@ -42,7 +42,7 @@ async function fetchAllPages(url: string, token: string) {
   let after: string | null = null
 
   while (true) {
-    const pageUrl = after ? `${url}&after=${after}` : url
+    const pageUrl: string = after ? `${url}&after=${after}` : url
     const res = await fetch(pageUrl, {
       headers: { Authorization: `Bearer ${token}` }
     })
@@ -63,7 +63,6 @@ export async function POST(request: Request) {
   try {
     const token = await getValidToken(accountId)
 
-    // Sync contacts
     const contacts = await fetchAllPages(
       'https://api.hubapi.com/crm/v3/objects/contacts?limit=100&properties=firstname,lastname,email,company,jobtitle',
       token
@@ -83,7 +82,6 @@ export async function POST(request: Request) {
       )
     }
 
-    // Sync companies
     const companies = await fetchAllPages(
       'https://api.hubapi.com/crm/v3/objects/companies?limit=100&properties=name,domain,industry,numberofemployees,annualrevenue,country',
       token
@@ -104,7 +102,6 @@ export async function POST(request: Request) {
       )
     }
 
-    // Sync deals
     const deals = await fetchAllPages(
       'https://api.hubapi.com/crm/v3/objects/deals?limit=100&properties=dealname,dealstage,amount,closedate,pipeline,hs_lastmodifieddate',
       token
