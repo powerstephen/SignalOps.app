@@ -6,9 +6,8 @@ import GenerateTab from '../components/GenerateTab'
 import DataCentre from '../components/DataCentre'
 import AccelerateTab from '../components/AccelerateTab'
 import ProfitMatrix from '../components/ProfitMatrix'
-import SourcesBar from '../components/SourcesBar'
 import { ImportProvider, useImport } from '../context/ImportContext'
-import { Database } from 'lucide-react'
+import { ChevronDown, ChevronUp } from 'lucide-react'
 
 type Tab = 'icp' | 'profit' | 'recover' | 'generate' | 'accelerate' | 'deal'
 
@@ -21,7 +20,7 @@ const tabs: { id: Tab; label: string; icon: string }[] = [
   { id: 'deal',       label: 'Deal',     icon: '/agent-deal.png' },
 ]
 
-function DataCentreButton({ onClick, isOpen }: { onClick: () => void; isOpen: boolean }) {
+function DataCentreBar({ isOpen, onToggle }: { isOpen: boolean; onToggle: () => void }) {
   const { sources } = useImport()
   const [hubspotConnected, setHubspotConnected] = useState(false)
 
@@ -36,31 +35,40 @@ function DataCentreButton({ onClick, isOpen }: { onClick: () => void; isOpen: bo
   const billingConnected = sources.some(s => s.id === 'csv-billing' || s.type === 'billing')
   const csConnected = sources.some(s => s.id === 'csv-cs' || s.type === 'cs')
 
-  const connected = [crmConnected, billingConnected, csConnected].filter(Boolean).length
-  const total = 3
-  const isComplete = connected === total
+  function StatusPill({ label, connected }: { label: string; connected: boolean }) {
+    return (
+      <span className={`flex items-center gap-1.5 text-xs font-medium ${connected ? 'text-teal-400' : 'text-slate-500'}`}>
+        <span className={`w-1.5 h-1.5 rounded-full ${connected ? 'bg-teal-400' : 'bg-slate-600'}`} />
+        {label}
+        {connected ? <span className="text-teal-500">✓</span> : <span className="text-slate-600">—</span>}
+      </span>
+    )
+  }
 
   return (
     <button
-      onClick={onClick}
-      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold tracking-wide transition-all hover:opacity-90 ${
+      onClick={onToggle}
+      className={`w-full flex items-center justify-between px-6 py-2.5 border-b transition-colors ${
         isOpen
-          ? 'border-teal-500/60 bg-teal-500/20 text-teal-300'
-          : isComplete
-            ? 'border-teal-500/40 bg-teal-500/10 text-teal-400'
-            : connected > 0
-              ? 'border-amber-500/40 bg-amber-500/10 text-amber-400'
-              : 'border-amber-500/60 bg-amber-500/10 text-amber-400 animate-pulse'
+          ? 'bg-slate-800/60 border-slate-700'
+          : 'bg-slate-900/40 border-slate-800 hover:bg-slate-800/30'
       }`}
     >
-      <Database size={13} />
-      <span>Data Centre</span>
-      <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs font-bold ${
-        isComplete ? 'bg-teal-500/20 text-teal-300' : 'bg-amber-500/20 text-amber-300'
-      }`}>
-        <span className={`w-1.5 h-1.5 rounded-full ${isComplete ? 'bg-teal-400' : 'bg-amber-400'} ${!isComplete ? 'animate-pulse' : ''}`} />
-        {connected}/{total}
-      </span>
+      <div className="flex items-center gap-6">
+        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Data Centre</span>
+        <div className="flex items-center gap-5">
+          <StatusPill label="CRM" connected={crmConnected} />
+          <StatusPill label="Billing" connected={billingConnected} />
+          <StatusPill label="CS" connected={csConnected} />
+        </div>
+        {!crmConnected && (
+          <span className="text-xs text-amber-400 animate-pulse">— connect your data to unlock all agents</span>
+        )}
+      </div>
+      <div className="flex items-center gap-1.5 text-xs text-slate-500">
+        <span>{isOpen ? 'Close' : 'Manage'}</span>
+        {isOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+      </div>
     </button>
   )
 }
@@ -73,9 +81,8 @@ function DashboardInner() {
     <div className="min-h-screen bg-[#0F172A] text-white">
       {/* Nav */}
       <nav className="border-b border-slate-800 px-6 py-0 flex items-center justify-between h-16 relative">
-        <div className="flex items-center gap-4 flex-shrink-0">
+        <div className="flex-shrink-0">
           <img src="/logo.png" alt="SignalOps" className="h-12" />
-          <DataCentreButton onClick={() => setShowDataCentre(!showDataCentre)} isOpen={showDataCentre} />
         </div>
         <div className="absolute left-1/2 -translate-x-1/2">
           <span className="text-base font-bold text-slate-200 tracking-widest uppercase">Revenue Intelligence Platform</span>
@@ -86,27 +93,7 @@ function DashboardInner() {
         </div>
       </nav>
 
-      {/* Data Centre slide-down panel */}
-      {showDataCentre && (
-        <div className="border-b border-slate-800 bg-slate-900/80 backdrop-blur">
-          <div className="max-w-6xl mx-auto px-6 py-6">
-            <div className="flex items-center justify-between mb-5">
-              <div>
-                <h2 className="text-sm font-bold text-white">Data Centre</h2>
-                <p className="text-xs text-slate-500 mt-0.5">Connect your data sources to unlock all six agents</p>
-              </div>
-              <button
-                onClick={() => setShowDataCentre(false)}
-                className="text-xs text-slate-500 hover:text-white border border-slate-700 px-3 py-1.5 rounded-lg transition-colors">
-                Close ✕
-              </button>
-            </div>
-            <DataCentre />
-          </div>
-        </div>
-      )}
-
-      {/* Tab bar */}
+      {/* Agent tab bar */}
       <div className="max-w-6xl mx-auto px-6">
         <div className="flex border-b border-slate-800">
           {tabs.map(tab => {
@@ -114,7 +101,7 @@ function DashboardInner() {
             return (
               <button
                 key={tab.id}
-                onClick={() => { setActiveTab(tab.id); setShowDataCentre(false) }}
+                onClick={() => setActiveTab(tab.id)}
                 style={{ flex: '1 1 0' }}
                 className={`relative flex items-center justify-center gap-2 py-4 text-xs font-bold tracking-widest uppercase transition-colors -mb-px whitespace-nowrap ${
                   active ? 'text-teal-400' : 'text-slate-500 hover:text-teal-300'
@@ -134,9 +121,22 @@ function DashboardInner() {
         </div>
       </div>
 
+      {/* Data Centre bar */}
+      <div className="max-w-6xl mx-auto px-0">
+        <DataCentreBar isOpen={showDataCentre} onToggle={() => setShowDataCentre(!showDataCentre)} />
+      </div>
+
+      {/* Data Centre expanded */}
+      {showDataCentre && (
+        <div className="border-b border-slate-800 bg-slate-900/60">
+          <div className="max-w-6xl mx-auto px-6 py-6">
+            <DataCentre />
+          </div>
+        </div>
+      )}
+
       {/* Content */}
       <div className="max-w-6xl mx-auto px-6 py-7">
-        {!showDataCentre && <SourcesBar />}
         {activeTab === 'icp'        && <ICPProfile />}
         {activeTab === 'profit'     && <ProfitMatrix />}
         {activeTab === 'recover'    && <RecoverTab />}
