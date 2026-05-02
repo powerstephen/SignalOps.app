@@ -7,7 +7,7 @@ import DataCentre from '../components/DataCentre'
 import AccelerateTab from '../components/AccelerateTab'
 import ProfitMatrix from '../components/ProfitMatrix'
 import { ImportProvider, useImport } from '../context/ImportContext'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, Database } from 'lucide-react'
 
 type Tab = 'icp' | 'profit' | 'recover' | 'generate' | 'accelerate' | 'deal'
 
@@ -34,42 +34,68 @@ function DataCentreBar({ isOpen, onToggle }: { isOpen: boolean; onToggle: () => 
   const crmConnected = hubspotConnected || sources.some(s => s.id === 'csv-crm')
   const billingConnected = sources.some(s => s.id === 'csv-billing' || s.type === 'billing')
   const csConnected = sources.some(s => s.id === 'csv-cs' || s.type === 'cs')
-
-  function StatusPill({ label, connected }: { label: string; connected: boolean }) {
-    return (
-      <span className={`flex items-center gap-1.5 text-xs font-medium ${connected ? 'text-teal-400' : 'text-slate-500'}`}>
-        <span className={`w-1.5 h-1.5 rounded-full ${connected ? 'bg-teal-400' : 'bg-slate-600'}`} />
-        {label}
-        {connected ? <span className="text-teal-500">✓</span> : <span className="text-slate-600">—</span>}
-      </span>
-    )
-  }
+  const connected = [crmConnected, billingConnected, csConnected].filter(Boolean).length
+  const total = 3
+  const isComplete = connected === total
 
   return (
-    <button
-      onClick={onToggle}
-      className={`w-full flex items-center justify-between px-6 py-2.5 border-b transition-colors ${
-        isOpen
-          ? 'bg-slate-800/60 border-slate-700'
-          : 'bg-slate-900/40 border-slate-800 hover:bg-slate-800/30'
-      }`}
-    >
-      <div className="flex items-center gap-6">
-        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Data Centre</span>
-        <div className="flex items-center gap-5">
-          <StatusPill label="CRM" connected={crmConnected} />
-          <StatusPill label="Billing" connected={billingConnected} />
-          <StatusPill label="CS" connected={csConnected} />
-        </div>
-        {!crmConnected && (
-          <span className="text-xs text-amber-400 animate-pulse">— connect your data to unlock all agents</span>
-        )}
+    <div className={`border-b border-t border-slate-700/80 transition-colors ${
+      isComplete ? 'bg-teal-500/5' : 'bg-amber-500/5'
+    }`}>
+      <div className="max-w-6xl mx-auto px-6">
+        <button
+          onClick={onToggle}
+          className="w-full flex items-center justify-between py-3 gap-6"
+        >
+          {/* Left — label + status */}
+          <div className="flex items-center gap-4">
+            <div className={`flex items-center gap-2 px-3 py-1 rounded-lg border text-xs font-bold ${
+              isComplete
+                ? 'border-teal-500/30 bg-teal-500/10 text-teal-400'
+                : 'border-amber-500/30 bg-amber-500/10 text-amber-400'
+            }`}>
+              <Database size={12} />
+              <span>Data Centre</span>
+              <span className={`w-4 h-4 rounded-full flex items-center justify-center text-xs font-bold ${
+                isComplete ? 'bg-teal-500 text-white' : 'bg-amber-500 text-white'
+              }`}>{connected}</span>
+              <span className="text-xs opacity-60">/{total}</span>
+            </div>
+
+            {/* Three pills */}
+            <div className="flex items-center gap-3">
+              {[
+                { label: 'CRM', connected: crmConnected },
+                { label: 'Billing', connected: billingConnected },
+                { label: 'CS', connected: csConnected },
+              ].map(item => (
+                <span key={item.label} className={`flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border ${
+                  item.connected
+                    ? 'border-teal-500/30 bg-teal-500/10 text-teal-400'
+                    : 'border-slate-700 bg-slate-800/50 text-slate-500'
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${item.connected ? 'bg-teal-400' : 'bg-slate-600'}`} />
+                  {item.label}
+                  {item.connected ? ' ✓' : ''}
+                </span>
+              ))}
+            </div>
+
+            {!isComplete && (
+              <span className="text-xs text-amber-400/70 italic">
+                — connect your data sources to unlock full agent intelligence
+              </span>
+            )}
+          </div>
+
+          {/* Right — toggle */}
+          <div className="flex items-center gap-1.5 text-xs text-slate-500 flex-shrink-0">
+            <span>{isOpen ? 'Close' : 'Manage'}</span>
+            {isOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+          </div>
+        </button>
       </div>
-      <div className="flex items-center gap-1.5 text-xs text-slate-500">
-        <span>{isOpen ? 'Close' : 'Manage'}</span>
-        {isOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-      </div>
-    </button>
+    </div>
   )
 }
 
@@ -92,6 +118,18 @@ function DashboardInner() {
           <span className="text-xs text-slate-500">Live</span>
         </div>
       </nav>
+
+      {/* Data Centre bar — above agents */}
+      <DataCentreBar isOpen={showDataCentre} onToggle={() => setShowDataCentre(!showDataCentre)} />
+
+      {/* Data Centre expanded */}
+      {showDataCentre && (
+        <div className="border-b border-slate-700/50 bg-slate-900/60">
+          <div className="max-w-6xl mx-auto px-6 py-6">
+            <DataCentre />
+          </div>
+        </div>
+      )}
 
       {/* Agent tab bar */}
       <div className="max-w-6xl mx-auto px-6">
@@ -120,20 +158,6 @@ function DashboardInner() {
           })}
         </div>
       </div>
-
-      {/* Data Centre bar */}
-      <div className="max-w-6xl mx-auto px-0">
-        <DataCentreBar isOpen={showDataCentre} onToggle={() => setShowDataCentre(!showDataCentre)} />
-      </div>
-
-      {/* Data Centre expanded */}
-      {showDataCentre && (
-        <div className="border-b border-slate-800 bg-slate-900/60">
-          <div className="max-w-6xl mx-auto px-6 py-6">
-            <DataCentre />
-          </div>
-        </div>
-      )}
 
       {/* Content */}
       <div className="max-w-6xl mx-auto px-6 py-7">
