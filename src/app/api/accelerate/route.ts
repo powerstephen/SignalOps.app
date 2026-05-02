@@ -9,7 +9,8 @@ export async function POST(request: Request) {
       .from('hs_deals')
       .select('*')
       .eq('account_id', accountId)
-      .not('stage', 'in', '("closedwon","closedlost")')
+      .not('stage', 'eq', 'closedwon')
+      .not('stage', 'eq', 'closedlost')
       .limit(40)
 
     const hasRealDeals = deals && deals.length > 0
