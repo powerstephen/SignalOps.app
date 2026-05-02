@@ -135,9 +135,24 @@ export default function AccelerateTab() {
   const [copied, setCopied] = useState<string|null>(null)
   const [sent, setSent] = useState<string|null>(null)
 
-  function handleScore() {
+async function handleScore() {
     setLoading(true)
-    setTimeout(() => { setDeals(MOCK_DEALS); setLoading(false) }, 2200)
+    try {
+      const res = await fetch('/api/accelerate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accountId: 'demo-account' }),
+      })
+      const data = await res.json()
+      if (data.deals && data.deals.length > 0) {
+        setDeals(data.deals)
+      } else {
+        setDeals(MOCK_DEALS)
+      }
+    } catch {
+      setDeals(MOCK_DEALS)
+    }
+    setLoading(false)
   }
 
   function copy(text: string, id: string) {
