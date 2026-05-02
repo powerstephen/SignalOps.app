@@ -43,6 +43,37 @@ function IntegrationLogo({ logo, fallback, name }: { logo: string; fallback: str
   return <img src={logo} alt={name} className="w-8 h-8 object-contain" onError={() => setError(true)} />
 }
 
+// Unified card component for both integrations and CSV upload
+function IntegrationCard({ 
+  logo, fallback, name, description, onAction, actionLabel, actionIcon, comingSoon, connected, onDisconnect
+}: {
+  logo: string; fallback: string; name: string; description: string
+  onAction?: () => void; actionLabel?: string; actionIcon?: any
+  comingSoon?: boolean; connected?: boolean; onDisconnect?: () => void
+}) {
+  return (
+    <div className={`bg-white rounded-2xl p-4 flex flex-col shadow-sm transition-all ${connected ? 'ring-2 ring-teal-500' : 'hover:shadow-md'}`}>
+      <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center border border-gray-100 mb-3">
+        <IntegrationLogo logo={logo} fallback={fallback} name={name} />
+      </div>
+      <h3 className="font-bold text-gray-900 text-sm mb-1">{name}</h3>
+      <p className="text-gray-500 text-xs leading-relaxed flex-1 mb-3">{description}</p>
+      {comingSoon ? (
+        <div className="text-xs text-gray-400 border border-gray-200 rounded-xl px-3 py-2 text-center">Coming soon</div>
+      ) : connected ? (
+        <button onClick={onDisconnect} className="flex items-center justify-center gap-1.5 text-xs font-medium text-red-400 border border-red-200 rounded-xl px-3 py-2 hover:bg-red-50 transition-colors w-full">
+          <Unlink size={11} /> Disconnect
+        </button>
+      ) : (
+        <button onClick={onAction} className="flex items-center justify-center gap-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl px-3 py-2 transition-colors w-full">
+          {actionIcon && <span>{actionIcon}</span>}
+          {actionLabel || 'Connect'}
+        </button>
+      )}
+    </div>
+  )
+}
+
 export default function DataCentre() {
   const { sources, removeSource, addSource } = useImport()
   const [hubspotConnected, setHubspotConnected] = useState(false)
@@ -94,13 +125,6 @@ export default function DataCentre() {
     setImporting(ig)
   }
 
-  function handleCsvUpload(file: File, catId: string, cat: any) {
-    if (!file || !cat.csvFields.length) return
-    setTimeout(() => {
-      addSource({ id:`csv-${catId}`, name:`CSV — ${cat.csvLabel}`, type:catId as any, records:cat.csvRecords, label:cat.csvLabel, connectedAt:new Date().toISOString() })
-    }, 1800)
-  }
-
   return (
     <div className="space-y-2">
       {importing && importing.datasets && (
@@ -112,59 +136,43 @@ export default function DataCentre() {
         const isOpen = openCat === cat.id
         const catIntegrations = integrations.filter(i => i.category === cat.id)
         const csvConnected = sources.some(s => s.id === `csv-${cat.id}`)
-        const connectedIntegration = catIntegrations.find(ig =>
-          ig.id !== 'hubspot' && ig.datasets?.some(ds =>
-            sources.some(s => s.id === `${ig.id}-${ds.label.toLowerCase().replace(/\s/g, '-')}`)
-          )
-        )
 
         return (
           <div key={cat.id} className="border border-slate-700/50 rounded-xl overflow-hidden">
-            {/* Row header — always visible */}
+            {/* Row header */}
             <button
               onClick={() => setOpenCat(isOpen ? null : cat.id)}
               className={`w-full flex items-center justify-between px-5 py-3.5 transition-colors text-left ${
                 isOpen ? 'bg-slate-800/60' : 'bg-slate-800/30 hover:bg-slate-800/50'
               }`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
                 {connected
                   ? <CheckCircle size={15} className="text-teal-500 flex-shrink-0" />
                   : <div className="w-3.5 h-3.5 rounded-full border-2 border-slate-600 flex-shrink-0" />
                 }
                 <span className="text-sm font-bold text-white">{cat.label}</span>
                 {connected && cat.id === 'crm' && hubspotConnected && (
-                  <span className="text-xs text-slate-400">HubSpot · {hubspotCounts.contacts} contacts · {hubspotCounts.companies} companies · {hubspotCounts.deals} deals</span>
-                )}
-                {connected && cat.id === 'crm' && !hubspotConnected && (
-                  <span className="text-xs text-slate-400">CSV imported</span>
-                )}
-                {connected && cat.id !== 'crm' && connectedIntegration && (
-                  <span className="text-xs text-slate-400">{connectedIntegration.name} connected</span>
-                )}
-                {connected && csvConnected && cat.id !== 'crm' && (
-                  <span className="text-xs text-slate-400">CSV imported</span>
+                  <span className="text-xs text-slate-400 truncate">HubSpot · {hubspotCounts.contacts} contacts · {hubspotCounts.companies} companies · {hubspotCounts.deals} deals</span>
                 )}
                 {!connected && (
-                  <span className="text-xs text-slate-500">{cat.description}</span>
+                  <span className="text-xs text-slate-500 truncate">{cat.description}</span>
                 )}
               </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                {connected && !isOpen && (
-                  <span className="text-xs text-teal-400 font-medium">Connected</span>
-                )}
-                {!connected && !isOpen && (
-                  <span className="text-xs text-amber-400 font-medium">Not connected</span>
-                )}
+              <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+                {connected
+                  ? <span className="text-xs text-teal-400 font-medium">Connected</span>
+                  : <span className="text-xs text-amber-400 font-medium">Not connected</span>
+                }
                 {isOpen ? <ChevronUp size={14} className="text-slate-400" /> : <ChevronDown size={14} className="text-slate-400" />}
               </div>
             </button>
 
-            {/* Expanded content */}
+            {/* Expanded */}
             {isOpen && (
               <div className="border-t border-slate-700/50 p-5 bg-slate-900/30">
 
-                {/* CRM — HubSpot connected summary */}
+                {/* HubSpot connected summary */}
                 {cat.id === 'crm' && hubspotConnected && (
                   <div className="bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm ring-2 ring-teal-500 mb-4">
                     <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center border border-gray-100 flex-shrink-0">
@@ -208,63 +216,58 @@ export default function DataCentre() {
                   </div>
                 )}
 
-                {/* Show integration cards only if not connected */}
-                {!connected && (
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                      {catIntegrations.map(ig => (
-                        <div key={ig.id} className="bg-white rounded-2xl p-4 flex flex-col shadow-sm hover:shadow-md transition-all">
-                          <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center border border-gray-100 mb-3">
-                            <IntegrationLogo logo={ig.logo} fallback={ig.fallback} name={ig.name} />
-                          </div>
-                          <h3 className="font-bold text-gray-900 text-sm mb-1">{ig.name}</h3>
-                          <p className="text-gray-500 text-xs leading-relaxed flex-1 mb-3">{ig.description}</p>
-                          {ig.comingSoon ? (
-                            <div className="text-xs text-gray-400 border border-gray-200 rounded-xl px-3 py-2 text-center">Coming soon</div>
-                          ) : (
-                            <button onClick={() => handleConnect(ig)} className="flex items-center justify-center gap-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl px-3 py-2 transition-colors w-full">
-                              <Plus size={13} /> Connect
-                            </button>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-
+                {/* Integration cards — only show if not connected */}
+                {!connected && (cat.id !== 'outreach' && cat.id !== 'signals') && (
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    {/* CSV upload card — first, before coming soon */}
                     {cat.csvFields.length > 0 && (
-                      <div>
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="flex-1 h-px bg-slate-700" />
-                          <span className="text-xs text-slate-500 font-medium">or upload a file instead</span>
-                          <div className="flex-1 h-px bg-slate-700" />
+                      <div className="bg-white rounded-2xl p-4 flex flex-col shadow-sm hover:shadow-md transition-all">
+                        <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center border border-gray-100 mb-3 text-xl">
+                          📊
                         </div>
-                        <div className="bg-white rounded-2xl p-4 border-2 border-dashed border-gray-200 hover:border-teal-400 cursor-pointer transition-all"
-                          onClick={() => fileRefs.current[cat.id]?.click()}>
-                          <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-lg border border-gray-100">📄</div>
-                            <div className="flex-1">
-                              <p className="font-bold text-gray-900 text-sm mb-0.5">Upload CSV or Google Sheet export</p>
-                              <p className="text-xs text-gray-500">Expected: {cat.csvFields.slice(0,5).join(', ')}{cat.csvFields.length > 5 ? '...' : ''}</p>
-                            </div>
-                            <button className="flex items-center gap-1.5 text-xs font-semibold text-white bg-slate-700 hover:bg-slate-600 rounded-lg px-3 py-2"
-                              onClick={e => { e.stopPropagation(); fileRefs.current[cat.id]?.click() }}>
-                              <Upload size={12} /> Upload
-                            </button>
-                          </div>
-                          <input
-                            ref={el => { fileRefs.current[cat.id] = el }}
-                            type="file" accept=".csv,.xlsx" className="hidden"
-                            onChange={e => { if (e.target.files?.[0]) handleCsvUpload(e.target.files[0], cat.id, cat) }}
-                          />
-                        </div>
+                        <h3 className="font-bold text-gray-900 text-sm mb-1">Spreadsheet</h3>
+                        <p className="text-gray-500 text-xs leading-relaxed flex-1 mb-3">Upload a CSV or Excel export from any source.</p>
+                        <button
+                          onClick={() => fileRefs.current[cat.id]?.click()}
+                          className="flex items-center justify-center gap-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl px-3 py-2 transition-colors w-full">
+                          <Upload size={12} /> Upload
+                        </button>
+                        <input
+                          ref={el => { fileRefs.current[cat.id] = el }}
+                          type="file" accept=".csv,.xlsx" className="hidden"
+                          onChange={e => {
+                            if (e.target.files?.[0]) {
+                              setTimeout(() => {
+                                addSource({ id:`csv-${cat.id}`, name:`CSV — ${cat.csvLabel}`, type:cat.id as any, records:cat.csvRecords, label:cat.csvLabel, connectedAt:new Date().toISOString() })
+                              }, 1800)
+                            }
+                          }}
+                        />
                       </div>
                     )}
+
+                    {/* Native integrations */}
+                    {catIntegrations.map(ig => (
+                      <IntegrationCard
+                        key={ig.id}
+                        logo={ig.logo}
+                        fallback={ig.fallback}
+                        name={ig.name}
+                        description={ig.description}
+                        comingSoon={ig.comingSoon}
+                        onAction={() => handleConnect(ig)}
+                        actionLabel="Connect"
+                        actionIcon={<Plus size={13} />}
+                      />
+                    ))}
                   </div>
                 )}
 
-                {/* Coming soon categories */}
+                {/* Outreach / Signals coming soon */}
                 {(cat.id === 'outreach' || cat.id === 'signals') && (
-                  <div className="text-center py-4">
-                    <p className="text-xs text-slate-500">Integrations coming soon — stay tuned.</p>
+                  <div className="text-center py-6">
+                    <p className="text-sm text-slate-400 mb-1">Coming soon</p>
+                    <p className="text-xs text-slate-500">This category will be available in the next release.</p>
                   </div>
                 )}
               </div>
