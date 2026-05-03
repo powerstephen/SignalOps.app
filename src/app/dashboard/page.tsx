@@ -39,60 +39,63 @@ function DataCentreBar({ isOpen, onToggle }: { isOpen: boolean; onToggle: () => 
   const isComplete = connected === total
 
   return (
-    <div className={`border-b border-t border-slate-700/80 transition-colors ${
-      isComplete ? 'bg-teal-500/5' : 'bg-amber-500/5'
-    }`}>
+    <div className="border-b border-slate-700/60 bg-slate-900/60">
       <div className="max-w-6xl mx-auto px-6">
-        <button
-          onClick={onToggle}
-          className="w-full flex items-center justify-between py-3 gap-6"
-        >
-          {/* Left — label + status */}
-          <div className="flex items-center gap-4">
-            <div className={`flex items-center gap-2 px-3 py-1 rounded-lg border text-xs font-bold ${
-              isComplete
-                ? 'border-teal-500/30 bg-teal-500/10 text-teal-400'
-                : 'border-amber-500/30 bg-amber-500/10 text-amber-400'
-            }`}>
-              <Database size={12} />
-              <span>Data Centre</span>
-              <span className={`w-4 h-4 rounded-full flex items-center justify-center text-xs font-bold ${
-                isComplete ? 'bg-teal-500 text-white' : 'bg-amber-500 text-white'
-              }`}>{connected}</span>
-              <span className="text-xs opacity-60">/{total}</span>
-            </div>
+        <button onClick={onToggle} className="w-full flex items-center gap-4 py-3">
 
-            {/* Three pills */}
-            <div className="flex items-center gap-3">
-              {[
-                { label: 'CRM', connected: crmConnected },
-                { label: 'Billing', connected: billingConnected },
-                { label: 'CS', connected: csConnected },
-              ].map(item => (
-                <span key={item.label} className={`flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border ${
-                  item.connected
-                    ? 'border-teal-500/30 bg-teal-500/10 text-teal-400'
-                    : 'border-slate-700 bg-slate-800/50 text-slate-500'
-                }`}>
-                  <span className={`w-1.5 h-1.5 rounded-full ${item.connected ? 'bg-teal-400' : 'bg-slate-600'}`} />
-                  {item.label}
-                  {item.connected ? ' ✓' : ''}
-                </span>
+          {/* Left pill — Data Centre + progress bars + count */}
+          <div className={`flex items-center gap-2.5 px-3 py-1.5 rounded-lg border flex-shrink-0 ${
+            isComplete
+              ? 'border-teal-500/30 bg-teal-500/10'
+              : 'border-amber-500/30 bg-amber-500/10'
+          }`}>
+            <Database size={13} className={isComplete ? 'text-teal-400' : 'text-amber-400'} />
+            <span className={`text-xs font-bold ${isComplete ? 'text-teal-400' : 'text-amber-400'}`}>
+              Data Centre
+            </span>
+            <div className="flex items-center gap-1">
+              {[0, 1, 2].map(i => (
+                <div key={i} className={`h-1.5 w-6 rounded-full ${
+                  i < connected
+                    ? isComplete ? 'bg-teal-400' : 'bg-amber-400'
+                    : 'bg-slate-600'
+                }`} />
               ))}
             </div>
-
-            {!isComplete && (
-              <span className="text-xs text-amber-400/70 italic">
-                — connect your data sources to unlock full agent intelligence
-              </span>
-            )}
+            <span className={`text-xs font-bold ${isComplete ? 'text-teal-400' : 'text-amber-400'}`}>
+              {connected}/{total}
+            </span>
           </div>
 
-          {/* Right — toggle */}
-          <div className="flex items-center gap-1.5 text-xs text-slate-500 flex-shrink-0">
-            <span>{isOpen ? 'Close' : 'Manage'}</span>
+          {/* Three source pills spread across */}
+          <div className="flex-1 grid grid-cols-3 gap-3">
+            {[
+              { label: 'CRM', connected: crmConnected },
+              { label: 'Billing', connected: billingConnected },
+              { label: 'CS', connected: csConnected },
+            ].map(item => (
+              <div key={item.label} className={`flex items-center justify-between px-4 py-1.5 rounded-lg border ${
+                item.connected
+                  ? 'border-teal-500/30 bg-slate-800/60'
+                  : 'border-slate-700 bg-slate-800/40'
+              }`}>
+                <div className="flex items-center gap-2">
+                  <span className={`w-1.5 h-1.5 rounded-full ${item.connected ? 'bg-teal-400' : 'bg-slate-600'}`} />
+                  <span className="text-xs font-semibold text-white">{item.label}</span>
+                </div>
+                {item.connected
+                  ? <span className="text-xs text-teal-400 font-medium flex items-center gap-1">✓ Connected</span>
+                  : <span className="text-xs text-amber-400 font-medium">Connect →</span>
+                }
+              </div>
+            ))}
+          </div>
+
+          {/* Toggle */}
+          <div className="flex items-center gap-1 text-xs text-slate-500 flex-shrink-0">
             {isOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
           </div>
+
         </button>
       </div>
     </div>
@@ -119,7 +122,7 @@ function DashboardInner() {
         </div>
       </nav>
 
-      {/* Data Centre bar — above agents */}
+      {/* Data Centre bar */}
       <DataCentreBar isOpen={showDataCentre} onToggle={() => setShowDataCentre(!showDataCentre)} />
 
       {/* Data Centre expanded */}
